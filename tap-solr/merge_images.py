@@ -11,8 +11,8 @@ rows = 100000
 delim = '\t'
 
 # nb: DTYPE_s is handled specially further down; THUMBNAIL and FILENAME eliminated -- redundant
-OUTPUT_FIELDS = 'T_s SITE_s YEAR_s OP_s SQ_s LOT_s ROLL_s EXP_s TRAY_s AREA_s LEVEL_s MATERIAL_s NOTES_s STRATUM_s CLASS_s ' + \
-                'IMAGENAME_s BUR_s COUNT_s DIRECTORY_s DOC_s DTYPES_ONLY_ss DTYPES_ss ' + \
+OUTPUT_FIELDS = 'T_s SITE_s YEAR_s OP_s SQ_s LOT_s ROLL_s EXP_s AREA_s TRAY_s LEVEL_s MATERIAL_s NOTES_s STRATUM_s CLASS_s ' + \
+                'IMAGENAME_s BUR_s COUNT_s DIRECTORY_s DTYPES_ONLY_ss DTYPES_ss ' + \
                 'ENTRY_DATE_s ETC_s EXCAVATIONDATE_s EXCAVATOR_s FEATURE__s FEA_s ' + \
                 'FILENAMES_ss IMAGES_ss KEYTERMS_ss ' + \
                 'RECORDS_ss REGISTRAR_s REG_s SEASON_s ' + \
@@ -23,7 +23,7 @@ KEY_TYPES = defaultdict(int)
 record_list = []
 keys = defaultdict(list)
 DTYPE_COUNTS = defaultdict(int)
-DTYPES = 'box bags master photologs images polaroids tray'.split(' ')
+DTYPES = 'master bags photologs images box polaroids tray'.split(' ')
 # DTYPES = 'photologs images polaroids box'.split(' ')
 SEASONS = {'86': 'NPW', '90': 'NKH', '92': 'NKH', '94': 'NML'}
 DIST = defaultdict(defaultdict)
@@ -66,6 +66,12 @@ def add_items(merged_records, hit):
         merged_records['DTYPES_ss'][this_dtype] += 1
         DTYPE_COUNTS[this_dtype] += 1
 
+# special cases
+def fix_hit(hit):
+    if 'YEAR_s' in hit and hit['YEAR_s'] == '8':
+        hit['YEAR_s'] = '86'
+    if 'AREA_s' in hit:
+        hit['AREA_s'] = hit['AREA_s'].upper()
 
 # create a connection to a solr server
 s = solr.SolrConnection(f'http://localhost:8983/solr/{core}')
@@ -84,6 +90,7 @@ for i, dtype in enumerate(DTYPES):
         photo_key = ''
         SEQ += 1
         seq_key = f'S{SEQ:05}'
+        fix_hit(hit)
         for r in hit:
             if '_s' in r:
                 FIELDS[r] += 1
@@ -119,8 +126,8 @@ for i, dtype in enumerate(DTYPES):
             except:
                 EXP = 'EEE'
             try:
-                # photo_key = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
-                photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                photo_key = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
             except:
                 photo_key = ''
             if (ROLL == 'RRR' or EXP == 'EEE') and tno_key == '':
@@ -130,7 +137,7 @@ for i, dtype in enumerate(DTYPES):
                 KEY_TYPES[dtype + ' SSS YY R E'] += 1
         record_list.append([tno_key, photo_key, seq_key, dtype, hit])
         if (SITE == 'SSS' or YEAR == 'YY') and tno_key == '':
-            print(f'problem "{tno_key}", "{photo_key}", "{seq_key}", {dtype}')
+            print(f'vague key: "{tno_key}", "{photo_key}", "{seq_key}", {dtype}', str(hit.values()))
         if YEAR in YEARS and SITE in SITE:
             DIST[YEAR][SITE] += 1
         else:
@@ -149,7 +156,7 @@ for r in record_list:
 
 
 with open(output_file, 'w') as outputfile:
-    csvoutput = csv.writer(outputfile, delimiter=delim, quoting=csv.QUOTE_NONE, quotechar=chr(255))
+    csvoutput = csv.writer(outputfile, delimiter=delim, quoting=csv.QUOTE_MINIMAL)
     FIELD_LIST = sorted(FIELDS)
     header = 'KEY_s DTYPE_s TITLE_s DTYPES_ss DTYPES_ONLY_ss RECORDS_ss IMAGES_ss FILENAMES_ss'.split(' ')
     csvoutput.writerow(header + OUTPUT_FIELDS)
@@ -164,6 +171,10 @@ with open(output_file, 'w') as outputfile:
                 if merged_fields[i] == '':
                     merged_fields[i] = get_cell(r[4], f)
             output_arr = []
+            if 'TITLE_s' in r[4]:
+                incoming_title = get_cell(r[4], 'TITLE_s')
+                if len(incoming_title) > len(title):
+                    title = incoming_title
             [output_arr.append(get_cell(r[4], f)) for f in ['DTYPE_s'] + OUTPUT_FIELDS]
             output_str = '%'.join(output_arr)
             subrecord.append(output_str)
@@ -193,15 +204,15 @@ for d in sorted(DTYPE_COUNTS):
 print('\ndistribution\n')
 #print(DIST)
 
-print('{:10}'.format(''),end='')
-for l in LOCATIONS:
-    print('{:10}'.format(l),end='')
-print()
-for s in YEARS:
-    print('{:10}'.format(s), end='')
-    for l in LOCATIONS:
-        print('{:10}'.format(DIST[s][l]),end='')
-    print()
+# print('{:10}'.format(''),end='')
+# for l in LOCATIONS:
+#     print('{:10}'.format(l),end='')
+# print()
+# for s in YEARS:
+#     print('{:10}'.format(s), end='')
+#     for l in LOCATIONS:
+#         print('{:10}'.format(DIST[s][l]),end='')
+#     print()
 
 print('\t',end='')
 for l in LOCATIONS:

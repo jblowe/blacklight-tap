@@ -8,7 +8,6 @@ while (<>) {
 chomp;
 s/\r//g;
 s/"//g;
-s/\r//g;
 s/\xca/ /g;
 s/\xe6/ /g;
 s/^/bags\t/;

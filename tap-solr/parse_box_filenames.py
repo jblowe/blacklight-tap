@@ -10,8 +10,7 @@ rows = 100000
 delim = '\t'
 
 # nb: DTYPE_s is handled specially further down
-OUTPUT_FIELDS = 'DTYPE_s SITE_s YEAR_s OP_s LOT_s REG_s AREA_s LEVEL_s MATERIAL_s NOTES_s TRAY_s SQ_s STRATUM_s CLASS_s BUR_s ROLL_s EXP_s T_s IMAGENAME_s FILENAME_s KEYTERMS_s DOC_s'.split(
-    ' ')
+OUTPUT_FIELDS = 'DTYPE_s SITE_s YEAR_s OP_s LOT_s REG_s AREA_s LEVEL_s MATERIAL_s NOTES_s TRAY_s SQ_s STRATUM_s CLASS_s BUR_s ROLL_s EXP_s T_s IMAGENAME_s FILENAME_s DOC_s'.split(' ')
 FIELDS = defaultdict(int)
 SEQ = 0
 
@@ -20,7 +19,8 @@ TERMS = {
     'SITE': 'NKH NPW NML TK'.split(' '),
     'OP': 'OP'.split(' '),
     'SQ': 'SQUARE SQ'.split(' '),
-    'LOT': 'LOT AREA AERA'.split(' '),
+    'LOT': 'LOT'.split(' '),
+    'AREA': 'AREA AERA'.split(' '),
     'REG': 'REG'.split(' '),
     'FEA': 'FEA FEAT FEATURE'.split(' '),
     'BUR': 'BURIALS BURIAL BUR B'.split(' '),
@@ -29,11 +29,13 @@ TERMS = {
     'EXP': '#'
 }
 
-DOCS = 'SCHEMATIC SCANS SCAN PROFILES PROFILE REPORTS REPORT RPT GRAPHS GRAPH SUMMARIES SUMMARY FORMS FORM NOTEBOOKS NOTEBOOK MAPS MAP SKETCHES SKETCH'.lower().split(' ')
+DOCS = 'SCHEMATIC SCANS SCAN PROFILES PROFILE REPORTS REPORT RPT GRAPHS GRAPH SUMMARIES SUMMARY FORMS FORM NOTEBOOKS NOTEBOOK MAPS MAP SKETCHES SKETCH'.lower().split(
+    ' ')
+
 
 def extract_terms(val):
     relative_path = val.replace('/Users/johnlowe/Box Sync/TAP Collaborations/', '')
-    path_elements = relative_path.split('/')
+    path_elements = re.split(r'\b',relative_path.replace('/',' ').replace('_',' '))
     filename = path_elements[-1]
     keyterms = set()
     fields = defaultdict()
@@ -51,7 +53,7 @@ def extract_terms(val):
                 if k == p.upper():
                     fields[t] = k
                     continue
-                regx = f'({k})[ _\-]?(\d+|[A-Z])\\b'
+                regx = f'({k})[ _\\-]?(\\d+|[A-Z])\\b'
                 terms = re.search(regx, p, re.IGNORECASE)
                 if terms is not None:
                     if t == 'PREFIX':
@@ -71,7 +73,7 @@ def extract_terms(val):
                         fields[t] = terms[2]
                     keyterms.add(f'{k} {terms[2]}')
                     p = p.replace(f'{terms[0]}', '')
-    k2 = re.findall(f'\w+', relative_path.replace('_', ' '))
+    k2 = re.findall(r'\w+', relative_path.replace('_', ' '))
     extras = set()
     [extras.add(x) for x in k2 if x not in keyterms]
     for INT in 'ROLL EXP BUR YEAR LOT SQ REQ OP'.split(' '):
@@ -92,9 +94,9 @@ with open(input_file) as inputfile:
         csvoutput.writerow(OUTPUT_FIELDS)
         for i, row in enumerate(csvinput):
             keyterms, extras, fields, filename, boxpath = extract_terms(row[path_col])
-            fields['KEYTERMS'] = '|'.join([ x for x in extras])
+            # fields['KEYTERMS'] = '|'.join([ x for x in extras])
             fields['DTYPE'] = 'box'
             fields['FILENAME'] = boxpath
             fields['IMAGENAME'] = filename
-            output_record = [ fields.get(o.replace('_s',''),'') for o in OUTPUT_FIELDS]
+            output_record = [fields.get(o.replace('_s', ''), '') for o in OUTPUT_FIELDS]
             csvoutput.writerow(output_record)
