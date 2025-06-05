@@ -43,8 +43,8 @@ def render_records(options = {})
   # Render the array of subrecords as a table
   content_tag(:table, class: 'table table-sm table-bordered') do
     # nb: this list of fields does NOT include IMAGENAME
-    fields = 'DTYPE T SITE YEAR OP SQ LOT ROLL EXP AREA LEVEL MATERIAL NOTES TRAY STRATUM CLASS IMAGENAME FILENAME'.split
-    columns = 10
+    fields = 'DTYPE T SITE YEAR OP SQ LOT ROLL EXP AREA TRAY LEVEL MATERIAL NOTES STRATUM CLASS IMAGENAME FILENAME'.split
+    columns = 12
     # Generate the table header
     thead = content_tag(:thead) do
       content_tag(:tr) do
