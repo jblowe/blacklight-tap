@@ -3,10 +3,9 @@
 # parse all 'base' data: photologs, imagenames, bag logs, inventories, Box files
 ./solr_bags.sh
 ./solr_photologs.sh
-#./solr_box.sh
 
 # photo archive
-python3 parseimagenames.py  ../tap-solr-data/images.csv ../tap-solr-data/TAP_images.csv
+python3 parseimagenames.py  ../tap-solr-data/media-converted.csv ../tap-solr-data/TAP_images.csv
 python3 assign_keyterms.py ../tap-solr-data/TAP_images.csv tmp; mv tmp ../tap-solr-data/TAP_images.csv
 
 # box files

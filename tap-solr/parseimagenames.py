@@ -17,14 +17,15 @@ with open(input_file, 'r') as inputfile:
             # (tap_dir, tap_id, derivative, stat, filepath, pattern) = [''] * 6
             pattern = ''
             # (filename, pattern) = row
-            (tap_dir, tap_id, derivative, stat, filepath) = row
-            thumbnail = f'/images/{tap_dir}/{derivative}'
+            # (tap_dir, tap_id, derivative, stat, filepath) = row
+            (tap_id, dummy, media_type, source, derivative, filename_only, filepath, stat, filesize) = row
+            thumbnail = f'/images/{derivative}'
             thumbnail = thumbnail.replace('#', '_')
             imagename, filename = parse_image_filename(filepath)
 
             if i == 0:
                 header = 'dtype_s t_s roll_s exp_s op_s sq_s area_s lot_s fea_s reg_s burial_s etc_s site_s year_s ' + \
-                         'filename_s filepath_s thumbnail_s pattern_s directory_s'
+                         'filename_s filepath_s thumbnail_s pattern_s stat_s, size_s'
                 header = re.sub(r'_S', '_s', header.upper()).split(' ')
                 csvoutput.writerow(header)
 
@@ -33,6 +34,6 @@ with open(input_file, 'r') as inputfile:
             output_record = [
                 dtype, tno,
                 roll, exp, op, sq, area, lot, fea, reg, bur, etc, site, season,
-                filename, filepath, thumbnail, pattern, tap_dir
+                filename, filepath, thumbnail, pattern, stat, filesize
             ]
             csvoutput.writerow(output_record)
