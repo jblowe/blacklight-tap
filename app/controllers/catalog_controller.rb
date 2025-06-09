@@ -117,7 +117,7 @@ class CatalogController < ApplicationController
     # FACET FIELDS
      config.add_facet_field 'DTYPE_s', label: 'Doc type', limit: true
      config.add_facet_field 'DTYPES_ONLY_ss', label: 'Doc Types', limit: true
-     config.add_facet_field 'T_s', label: 'T', limit: true
+     config.add_facet_field 'T_s', label: 'T#', limit: true
      config.add_facet_field 'KEY_s', label: 'KEY', limit: true
      # config.add_facet_field 'T_i', label: 'T numeric', limit: true
      config.add_facet_field 'SITE_s', label: 'SITE', limit: true
@@ -144,7 +144,7 @@ class CatalogController < ApplicationController
      config.add_facet_field 'KEYTERMS_ss', label: 'KEYTERMS', limit: true
 
     # INDEX DISPLAY
-     config.add_index_field 'T_s', label: 'T'
+     config.add_index_field 'T_s', label: 'T#'
      config.add_index_field 'KEY_s', label: 'KEY'
      # config.add_index_field 'T_i', label: 'T (numeric)'
      # config.add_index_field 'TITLE_s', label: 'TITLE'
@@ -178,12 +178,12 @@ class CatalogController < ApplicationController
      config.add_index_field 'KEYTERMS_s', label: 'KEYTERMS'
      config.add_index_field 'FILEPATH_s', helper_method: 'render_image_link', label: 'MEDIA'
      config.add_index_field 'FILENAME_s', label: 'FILENAME'
-     # config.add_index_field 'THUMBNAILNAME_s', label: 'THUMB'
+     # config.add_index_field 'THUMBNAIL_s', label: 'THUMB'
      config.add_index_field 'DTYPE_s', label: 'DTYPE'
 
 
     # SHOW DISPLAY
-     config.add_show_field 'T_s', label: 'T'
+     config.add_show_field 'T_s', label: 'T#'
      config.add_show_field 'KEY_s', label: 'KEY'
      # config.add_show_field 'T_i', label: 'T (numeric)'
      config.add_show_field 'SITE_s', label: 'SITE'
@@ -212,7 +212,6 @@ class CatalogController < ApplicationController
      config.add_show_field 'B_s', label: 'B'
      config.add_show_field 'CLASS_s', label: 'CLASS'
      config.add_show_field 'COUNT_s', label: 'COUNT'
-     config.add_show_field '# DIRECTORY_s', label: '# DIRECTORY'
      config.add_show_field 'ENTRY_DATE_s', label: 'ENTRY_DATE'
      config.add_show_field 'EXCAVATIONDATE_s', label: 'EXCAVATIONDATE'
      config.add_show_field 'MATERIAL_s', label: 'MATERIAL'
