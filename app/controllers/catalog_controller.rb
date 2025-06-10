@@ -115,8 +115,8 @@ class CatalogController < ApplicationController
     config.autocomplete_path = 'suggest'
 
     # FACET FIELDS
-     config.add_facet_field 'DTYPE_s', label: 'Doc type', limit: true
-     config.add_facet_field 'DTYPES_ONLY_ss', label: 'Doc Types', limit: true
+     # config.add_facet_field 'DTYPE_s', label: 'Doc type', limit: true
+     config.add_facet_field 'DTYPES_ONLY_ss', label: 'Doc types', limit: true
      config.add_facet_field 'T_s', label: 'T#', limit: true
      config.add_facet_field 'KEY_s', label: 'KEY', limit: true
      # config.add_facet_field 'T_i', label: 'T numeric', limit: true
@@ -179,7 +179,7 @@ class CatalogController < ApplicationController
      config.add_index_field 'FILEPATH_s', helper_method: 'render_image_link', label: 'MEDIA'
      config.add_index_field 'FILENAME_s', label: 'FILENAME'
      # config.add_index_field 'THUMBNAIL_s', label: 'THUMB'
-     config.add_index_field 'DTYPE_s', label: 'DTYPE'
+     # config.add_index_field 'DTYPE_s', label: 'DTYPE'
 
 
     # SHOW DISPLAY
@@ -207,7 +207,7 @@ class CatalogController < ApplicationController
      config.add_show_field 'WEIGHT_s', label: 'WEIGHT'
      config.add_show_field 'PHOTOTYPE_s', label: 'PHOTOTYPE'
      config.add_show_field 'REG_s', label: 'REG'
-     config.add_show_field 'DTYPE_s', label: 'DTYPE'
+     # config.add_show_field 'DTYPE_s', label: 'DTYPE'
      config.add_show_field 'BURIAL_s', label: 'BURIAL'
      config.add_show_field 'B_s', label: 'B'
      config.add_show_field 'CLASS_s', label: 'CLASS'
