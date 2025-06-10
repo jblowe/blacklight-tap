@@ -1,7 +1,12 @@
-ORIGINALfile="$(pwd)/$1"
-rm -f ~/TAP/TAP-analysis/filestats.csv
+#!/usr/bin/env bash
 
-cd /Volumes/VL2
+THISPWD=$(pwd)
+echo "pwd = $THISPWD"
+
+ORIGINALfile="$THISPWD/$1"
+rm -f $THISPWD/$3-filestats.csv
+
+cd "$2"
 
 while read -r ORIGINAL
 do
@@ -14,9 +19,9 @@ do
   STATS=$(file -b "${ORIGINAL}")
   STATS2=$(stat -f "%z,%Sc,$Sm" -t "%Y/%m/%d %H:%M:%S" "${ORIGINAL}")
   ((COUNTER++))
-  echo -e "${COUNTER}\t${F}\t${ORIGINAL}\t${STATS}\t${STATS2}" >> ~/TAP/TAP-analysis/filestats.csv
+  echo -e "${COUNTER}\t${F}\t${ORIGINAL}\t${STATS}\t${STATS2}" >> $THISPWD/$3-filestats.csv
 done <  ${ORIGINALfile}
 
 echo "${LINES} lines read from ${ORIGINALfile}"
-echo "${COUNTER} file stats output to filestats.csv"
+echo "${COUNTER} file stats output to $3-filestats.csv"
 

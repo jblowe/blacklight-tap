@@ -8,19 +8,23 @@ delim = '\t'
 
 input_file = sys.argv[1]
 output_file = sys.argv[2]
+file_format = sys.argv[3]
 with open(input_file, 'r') as inputfile:
     csvinput = csv.reader(inputfile, delimiter=delim, quoting=csv.QUOTE_NONE, quotechar=chr(255))
     with open(output_file, 'w') as outputfile:
         csvoutput = csv.writer(outputfile, delimiter=delim, quoting=csv.QUOTE_NONE, quotechar=chr(255))
         for i, row in enumerate(csvinput):
 
-            # (tap_dir, tap_id, derivative, stat, filepath, pattern) = [''] * 6
             pattern = ''
-            # (filename, pattern) = row
-            # (tap_dir, tap_id, derivative, stat, filepath) = row
-            (tap_id, dummy, media_type, source, derivative, filename_only, filepath, stat, filesize) = row
-            thumbnail = f'/images/{derivative}'
-            thumbnail = thumbnail.replace('#', '_')
+            if file_format == 'box':
+                (tap_id, dummy, media_type, source, derivative, filename_only, filepath, stat, filesize) = [''] * 9
+                filepath = f'Box/{row[0]}'
+                thumbnail = ''
+                filepath = filepath.replace('/Users/johnlowe/Box Sync/TAP Collaborations/', '')
+            elif file_format == 'images':
+                # (tap_dir, tap_id, derivative, stat, filepath) = row
+                (tap_id, dummy, media_type, source, derivative, filename_only, filepath, stat, filesize) = row
+                thumbnail = f'/images/{media_type}/{derivative}'
             imagename, filename = parse_image_filename(filepath)
 
             if i == 0:
@@ -29,7 +33,15 @@ with open(input_file, 'r') as inputfile:
                 header = re.sub(r'_S', '_s', header.upper()).split(' ')
                 csvoutput.writerow(header)
 
-            (dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc) = extract_fields(imagename, filepath)
+            if 'OP1' in filepath:
+                # print(op)
+                pass
+
+            (dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc) = extract_fields(imagename,
+                                                                                                          filepath)
+
+            if file_format == 'box':
+                dtype = 'box'
 
             output_record = [
                 dtype, tno,

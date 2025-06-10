@@ -3,6 +3,7 @@ import sys
 from collections import defaultdict
 import csv
 import re
+from image_fn import parse_image_filename, extract_fields
 
 input_file = sys.argv[1]
 output_file = sys.argv[2]
@@ -19,8 +20,7 @@ TERMS = {
     'SITE': 'NKH NPW NML TK'.split(' '),
     'OP': 'OP'.split(' '),
     'SQ': 'SQUARE SQ'.split(' '),
-    'LOT': 'LOT'.split(' '),
-    'AREA': 'AREA AERA'.split(' '),
+    'LOT': 'LOT AREA AERA'.split(' '),
     'REG': 'REG'.split(' '),
     'FEA': 'FEA FEAT FEATURE'.split(' '),
     'BUR': 'BURIALS BURIAL BUR B'.split(' '),
@@ -29,11 +29,13 @@ TERMS = {
     'EXP': '#'
 }
 
-DOCS = 'SCHEMATIC SCANS SCAN PROFILES PROFILE REPORTS REPORT RPT GRAPHS GRAPH SUMMARIES SUMMARY FORMS FORM NOTEBOOKS NOTEBOOK MAPS MAP SKETCHES SKETCH'.lower().split(
-    ' ')
+
+DOCS = 'SCHEMATIC SCAN PROFILE REPORT GRAPH SUMMAR FORMS FORM NOTEBOOK MAP SKETCH'.lower().split(' ')
 
 
 def extract_terms(val):
+    imagename, filename = parse_image_filename(val)
+    (dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc) = extract_fields(imagename, val)
     relative_path = val.replace('/Users/johnlowe/Box Sync/TAP Collaborations/', '')
     path_elements = re.split(r'\b',relative_path.replace('/',' ').replace('_',' '))
     filename = path_elements[-1]
@@ -41,12 +43,9 @@ def extract_terms(val):
     fields = defaultdict()
     for p in path_elements:
         if p == '': continue
-        # if p in 'johnlowe,Users,TAP Collaborations,Box Sync,TAP Photos'.split(','):
-        #     val = val.replace(p, '')
-        #     continue
         for d in DOCS:
             if d in p.lower():
-                fields['DOC'] = re.sub(r'e?s$', '', d)
+                fields['DOC'] = d
                 p = re.sub(d + ' +?', '', p, flags=re.IGNORECASE)
         for t in TERMS:
             for k in TERMS[t]:

@@ -5,11 +5,11 @@
 ./solr_photologs.sh
 
 # photo archive
-python3 parseimagenames.py  ../tap-solr-data/media-converted.csv ../tap-solr-data/TAP_images.csv
+python3 parseimagenames.py  ../tap-solr-data/media-converted.csv ../tap-solr-data/TAP_images.csv images
 python3 assign_keyterms.py ../tap-solr-data/TAP_images.csv tmp; mv tmp ../tap-solr-data/TAP_images.csv
 
 # box files
-python parse_box_filenames.py ../tap-solr-data/box-files.csv tmp
+python parseimagenames.py ../tap-solr-data/box-files.csv tmp box
 awk 'BEGIN{FS=OFS="\t"} {t=$18; $18=$2; $2=t; print} ' tmp > ../tap-solr-data/TAP_box.csv
 python3 assign_keyterms.py ../tap-solr-data/TAP_box.csv tmp; mv tmp ../tap-solr-data/TAP_box.csv
 

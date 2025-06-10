@@ -23,7 +23,7 @@ KEY_TYPES = defaultdict(int)
 record_list = []
 keys = defaultdict(list)
 DTYPE_COUNTS = defaultdict(int)
-DTYPES = 'polaroids tray images photologs bags master box'.split(' ')
+DTYPES = 'master polaroids tray images photologs bags box'.split(' ')
 # DTYPES = 'photologs images polaroids box'.split(' ')
 SEASONS = {'86': 'NPW', '90': 'NKH', '92': 'NKH', '94': 'NML'}
 DIST = defaultdict(defaultdict)
@@ -33,6 +33,8 @@ for s in YEARS:
     for l in LOCATIONS:
         DIST[s][l] = 0
 SEQ = 0
+OUTPUT_COUNT = 0
+MERGED_COUNT = 0
 
 
 def format_dtypes(dtypes):
@@ -57,7 +59,7 @@ def get_cell(hit, key):
 
 def add_items(merged_records, hit):
     if hit is not None:
-        merged_records['RECORDS'].append(hit)
+        # merged_records['RECORDS'].append(hit)
         if hit.get('THUMBNAIL_s') is not None: merged_records['IMAGES'].append(hit.get('THUMBNAIL_s'))
         if hit.get('FILEPATH_s') is not None: merged_records['FILENAMES'].append(hit.get('FILEPATH_s'))
         this_dtype = get_cell(hit, 'DTYPE_s')
@@ -66,12 +68,12 @@ def add_items(merged_records, hit):
         merged_records['DTYPES_ss'][this_dtype] += 1
         DTYPE_COUNTS[this_dtype] += 1
 
+
 # special cases
 def fix_hit(hit):
     if 'YEAR_s' in hit and hit['YEAR_s'] == '8':
         hit['YEAR_s'] = '86'
-    if 'AREA_s' in hit:
-        hit['AREA_s'] = hit['AREA_s'].upper()
+
 
 # create a connection to a solr server
 s = solr.SolrConnection(f'http://localhost:8983/solr/{core}')
@@ -110,34 +112,31 @@ for i, dtype in enumerate(DTYPES):
         ROLL = hit.get('ROLL_s', 'RRR')
         EXP = hit.get('EXP_s', 'EEE')
         SITE = hit.get('SITE_s', 'SSS')
+        FILEPATH = hit.get('FILEPATH_s', 'not an image')
         if SITE not in 'NPW|NKH|NML|PL|KTK'.split('|'):
             try:
                 SITE = SEASONS[YEAR]
             except:
                 SITE = 'SSS'
                 YEAR = 'YY'
-        if dtype == 'polaroids':
-            KEY_TYPES[dtype + ' Sequence'] += 1
-            tno_key = ''
+        try:
+            check = int(EXP)
+        except:
+            EXP = 'EEE'
+        try:
+            photo_key = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+            # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+        except:
             photo_key = ''
+        if (ROLL == 'RRR' or EXP == 'EEE') and tno_key == '':
+            KEY_TYPES[dtype + ' Sequence'] += 1
         else:
-            try:
-                check = int(EXP)
-            except:
-                EXP = 'EEE'
-            try:
-                photo_key = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
-                # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
-            except:
-                photo_key = ''
-            if (ROLL == 'RRR' or EXP == 'EEE') and tno_key == '':
-                KEY_TYPES[dtype + ' Sequence'] += 1
-            else:
-                seq_key = ''
-                KEY_TYPES[dtype + ' SSS YY R E'] += 1
+            seq_key = ''
+            KEY_TYPES[dtype + ' SSS YY R E'] += 1
         record_list.append([tno_key, photo_key, seq_key, dtype, hit])
         if (SITE == 'SSS' or YEAR == 'YY') and tno_key == '':
-            print(f'vague key: "{tno_key}", "{photo_key}", "{seq_key}", {dtype}', str(hit.values()))
+            print(f'vague key: {dtype}, "{tno_key}", "{photo_key}", "{seq_key}", {FILEPATH}')
+            # print(f'vague key: "{tno_key}", "{photo_key}", "{seq_key}", {dtype}', str(hit.values()))
         if YEAR in YEARS and SITE in SITE:
             DIST[YEAR][SITE] += 1
         else:
@@ -154,7 +153,6 @@ for r in record_list:
     else:
         print('problem', r)
 
-
 with open(output_file, 'w') as outputfile:
     csvoutput = csv.writer(outputfile, delimiter=delim, quoting=csv.QUOTE_MINIMAL)
     FIELD_LIST = sorted(FIELDS)
@@ -167,7 +165,7 @@ with open(output_file, 'w') as outputfile:
         merged_records = defaultdict(list)
         merged_fields = len(OUTPUT_FIELDS) * ['']
         for r in keys[key]:
-            for i,f in enumerate(OUTPUT_FIELDS):
+            for i, f in enumerate(OUTPUT_FIELDS):
                 if merged_fields[i] == '':
                     merged_fields[i] = get_cell(r[4], f)
             output_arr = []
@@ -177,8 +175,16 @@ with open(output_file, 'w') as outputfile:
                     title = incoming_title
             [output_arr.append(get_cell(r[4], f)) for f in ['DTYPE_s'] + OUTPUT_FIELDS]
             output_str = '%'.join(output_arr)
+            if output_str in subrecord:
+                print('duplicate',key,r[0:4])
             subrecord.append(output_str)
             add_items(merged_records, r[4])
+            OUTPUT_COUNT += 1
+
+        record_count = sum([merged_records['DTYPES_ss'][d] for d in merged_records['DTYPES_ss']])
+        if record_count > 100:
+            print('pathological merged record', key, title, merged_records['DTYPES_ss'])
+            continue
 
         output_record = [key, 'merged records', title,
                          format_dtypes(merged_records['DTYPES_ss']),
@@ -188,6 +194,11 @@ with open(output_file, 'w') as outputfile:
                          '|'.join(merged_records['FILENAMES'])
                          ] + merged_fields
         csvoutput.writerow(output_record)
+        MERGED_COUNT += 1
+
+print(f'input records, {SEQ}')
+print(f'output records, {OUTPUT_COUNT}')
+print(f'merged records, {MERGED_COUNT}')
 
 print('\nType & Token counts\n')
 for f in sorted(FIELDS):
@@ -202,7 +213,7 @@ for d in sorted(DTYPE_COUNTS):
     print(f'{d}\t{DTYPE_COUNTS[d]}')
 
 print('\ndistribution\n')
-#print(DIST)
+# print(DIST)
 
 # print('{:10}'.format(''),end='')
 # for l in LOCATIONS:
@@ -214,14 +225,14 @@ print('\ndistribution\n')
 #         print('{:10}'.format(DIST[s][l]),end='')
 #     print()
 
-print('\t',end='')
+print('\t', end='')
 for l in LOCATIONS:
-    print(f'{l}\t',end='')
+    print(f'{l}\t', end='')
 print()
 for s in YEARS:
     print(f'{s}\t', end='')
     for l in LOCATIONS:
-        print(f'{DIST[s][l]}\t',end='')
+        print(f'{DIST[s][l]}\t', end='')
     print()
 
 print()
