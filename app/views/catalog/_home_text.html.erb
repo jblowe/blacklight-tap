@@ -23,11 +23,11 @@
                 <li>Master bag log records</li>
                 <li>Photolog records (from Excel Spreadsheets)</li>
                 <li>Bags (from Excel Spreadsheets)</li>
-                <li>Images (from Box and Prof.Pigott's various hard drives and USB sticks)</li>
-                <li>Inventory record's (from Prof Voelkers's Penn Museum invenntory)</li>
-                <li>Files in the share Box folder</li>
+                <li>Images (from Box and Prof. Pigott's various hard drives and USB sticks)</li>
+                <li>Inventory record's (from Prof. Voelkers's Penn Museum inve\ntory)</li>
+                <li>Files in the shared Box folder</li>
             </ul>
-            <p>... and any combinations of the above</p>
+            <p>... and combinations of the above</p>
             <h3 style="margin-top: 15px; font-size: 1.2em" class='section-heading'>How it works</h3>
             <p>
                 What we have done is combined the various records together where possible using a common key.
@@ -37,15 +37,28 @@
                 <dd>
                     When a record (i.e. a spreadsheet row or image filename) contains a T#, all the data
                     associated with the T# can be listed together. So for numbered artifacts, all the images,
-                    bag log info, photolog info, etc. can be consolidated
+                    bag log info, photolog info, etc. can be consolidated.
                 </dd>
                 <dt>Image key</dt>
                 <dd>
-                    The filenames of the images do not usually carry much inforation. Typically, the filename
-                    of an "official" image includes the Season, the Roll # and the Exposure number. Using this
-                    information, we can match the image to the corresponding photolog number, which provides a
+                    The filenames of the images do not usually carry much information. Typically, the filename
+                    of an "official" image includes the Season, the Roll # and the Exposure number, but occaisionally additional
+                    information is included in the filename e.g. <i>Tap 94 Rol 168 #31 opc T#30691.tif</i>. Using this
+                    information, we can match the images to the corresponding photolog fields, which provides a
                     more complete description of the images.</dd>
             </dl>
+            <h3 style="margin-top: 15px; font-size: 1.2em" class='section-heading'>The search engine</h3>
+            <p>
+                Once the data is combined into a coherent whole, it can be served to users via a web browser.
+                Using the fabulous Blacklight "discovery framework", based on the Solr search engine,
+                we can load the merged records into a Solr database and have Blacklight provide a user interface.
+                The diagram below schematizes how this works. </p>
+            <p>
+                A bit of pipeline plumbing does the merging described above and the results are fed into Solr.
+                Solr presents the data using a basic keyword search box (at the top) and, more marvelously,
+                arranging many of the fields in "facets" at the left. The user can use these in combination to
+                generate a search result containing the desired information.
+            </p>
             <!-- img src="/images/tap1.png" -->
             <img src="/MFarchitecture.svg" -->
              <hr/>
