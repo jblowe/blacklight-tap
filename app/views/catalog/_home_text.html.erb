@@ -12,23 +12,33 @@
 <table>
     <tr class="grid">
         <td colspan=5>
-            <h3 style="margin-top: 15px; font-size: 1.2em" class='section-heading'>One of the world's most unusual search engines!</h3>
-            <p style="text-align: justify; font-size: 85%; line-height: 1.3em;">
+            <h3 style="margin-top: 15px; font-size: 1.2em" class='section-heading'>The TAP Finder</h3>
+            <!-- p style="text-align: justify; font-size: 85%; line-height: 1.3em;" -->
+            <p>
                 This website provides a means to "slice-and-dice" some of the myriad data elements
                 of the TAP project.
             </p>
-            <p style="font-size: 0.8em"><b>This is a work in progress! Caveat utilizator!</b></p>
+            <p>
+                The diagram below illustrates how 6 distinct but related data sets are combined to create a single
+                interface that present images and metadata in an easy-to-use manner. The interface consists of
+                a basic keyword search box (at the top) and, more marvelously,
+                arranging many of the fields in clickable "facets" at the left. The user can use these in combination
+                to generate a search result containing the desired information.
+            </p>
+            <p><img src="/MFarchitecture.svg"></p>
+            <p><i>Figure 1. Data flow and components of the TAP Finder</i></p>
             This search engine allows you to search for 6 types of TAP data:
             <ul>
-                <li>Master bag log records</li>
+                <li>Master bag log records  (from Excel Spreadsheet)</li>
                 <li>Photolog records (from Excel Spreadsheets)</li>
                 <li>Bags (from Excel Spreadsheets)</li>
                 <li>Images (from Box and Prof. Pigott's various hard drives and USB sticks)</li>
-                <li>Inventory record's (from Prof. Voelkers's Penn Museum inve\ntory)</li>
+                <li>Inventory records (from Prof. Voelkers's Penn Museum inve\ntory)</li>
                 <li>Files in the shared Box folder</li>
             </ul>
             <p>... and combinations of the above</p>
             <h3 style="margin-top: 15px; font-size: 1.2em" class='section-heading'>How it works</h3>
+            <p style="font-size: 0.8em"><b>This is a work in progress! Caveat utilizator!</b></p>
             <p>
                 What we have done is combined the various records together where possible using a common key.
                 There are two keys in use:</p>
@@ -55,12 +65,9 @@
                 The diagram below schematizes how this works. </p>
             <p>
                 A bit of pipeline plumbing does the merging described above and the results are fed into Solr.
-                Solr presents the data using a basic keyword search box (at the top) and, more marvelously,
-                arranging many of the fields in "facets" at the left. The user can use these in combination to
-                generate a search result containing the desired information.
+                Solr is a blazingly fast, open source search engine.
             </p>
             <!-- img src="/images/tap1.png" -->
-            <img src="/MFarchitecture.svg" -->
              <hr/>
         </td>
     </tr>
