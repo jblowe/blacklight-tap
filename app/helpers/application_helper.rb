@@ -5,7 +5,7 @@ module ApplicationHelper
     content_tag(:div) do
       options[:value].collect do |filename|
         filename = filename.gsub('#', '%23')
-        content_tag(:a, 'location of original photo',
+        content_tag(:a, 'location of original',
           href: "#{filename}",
           style: 'padding: 3px;',
           class: 'hrefclass')
