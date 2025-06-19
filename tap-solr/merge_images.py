@@ -12,7 +12,7 @@ delim = '\t'
 
 # nb: DTYPE_s is handled specially further down; THUMBNAIL and FILENAME eliminated -- redundant
 OUTPUT_FIELDS = 'T_s SITE_s YEAR_s OP_s SQ_s LOT_s ROLL_s EXP_s AREA_s TRAY_s LEVEL_s MATERIAL_s NOTES_s STRATUM_s CLASS_s ' + \
-                'IMAGENAME_s BUR_s COUNT_s DIRECTORY_s DTYPES_ONLY_ss DTYPES_ss ' + \
+                'IMAGENAME_s BURIAL_s COUNT_s DIRECTORY_s DTYPES_ONLY_ss DTYPES_ss DOC_ss' + \
                 'ENTRY_DATE_s ETC_s EXCAVATIONDATE_s EXCAVATOR_s FEATURE__s FEA_s ' + \
                 'FILENAMES_ss IMAGES_ss KEYTERMS_ss ' + \
                 'RECORDS_ss REGISTRAR_s REG_s SEASON_s ' + \
@@ -28,7 +28,7 @@ DTYPES = 'master polaroids tray images photologs bags box'.split(' ')
 SEASONS = {'86': 'NPW', '90': 'NKH', '92': 'NKH', '94': 'NML'}
 DIST = defaultdict(defaultdict)
 YEARS = '86 90 92 93 94 YY'.split(' ')
-LOCATIONS = 'NPW|NKH|NML|PL|KTK|SSS'.split('|')
+LOCATIONS = 'NPW|NKH|NML|PL|KTK|BKPK|SSS'.split('|')
 for s in YEARS:
     for l in LOCATIONS:
         DIST[s][l] = 0
@@ -73,8 +73,21 @@ def add_items(merged_records, hit):
 def fix_hit(hit):
     if 'YEAR_s' in hit and hit['YEAR_s'] == '8':
         hit['YEAR_s'] = '86'
+    if 'YEAR_s' in hit and hit['YEAR_s'] == '86' and 'T_s' in hit and 'T_s' == '1':
+        hit['T_s'] = ''
 
 
+def compute_pattern(filename):
+    pass
+
+errors = defaultdict(int)
+def write_errors(message, flds):
+    csverrors.writerow([message] + flds)
+    errors[message] += 1
+
+
+errorfile = open('merge_errors.csv', 'w')
+csverrors = csv.writer(errorfile, delimiter=delim, quoting=csv.QUOTE_MINIMAL)
 # create a connection to a solr server
 s = solr.SolrConnection(f'http://localhost:8983/solr/{core}')
 
@@ -88,59 +101,70 @@ for i, dtype in enumerate(DTYPES):
     total_records += response.numFound
     for counter, hit in enumerate(list(response.results)):
         key_type = dtype
-        tno_key = ''
-        photo_key = ''
+        key_tno = ''
+        key_photo = ''
         SEQ += 1
-        seq_key = f'S{SEQ:05}'
+        key_seq = f'S{SEQ:05}'
         fix_hit(hit)
         for r in hit:
             if '_s' in r:
                 FIELDS[r] += 1
+        if 'Site_s' in hit and hit['SITE_s'] == 'isotope':
+            record_list.append(['',f'isotope {hit["ETC_s"]}','', 'isotope', hit])
+            KEY_TYPES['isotope date'] += 1
+            continue
         if 'T_s' in hit:
             if hit['T_s'] != 'no T#':
                 try:
-                    tno_key = str(int(hit['T_s']))
+                    key_tno = str(int(hit['T_s']))
                     # tno_key = tno_key if 'T' not in tno_key else f'T{tno_key}'
-                    hit['T_s'] = tno_key
+                    hit['T_s'] = key_tno
                     KEY_TYPES[dtype + ' Tno'] += 1
                 except:
-                    print(f"non-numeric T#: {hit['T_s']}")
-                    tno_key = ''
+                    write_errors('non-numeric T#', [hit['T_s']])
+                    key_tno = ''
             else:
-                tno_key = ''
+                key_tno = ''
+        # we didn't find a tno key. check if we can make another
         YEAR = hit.get('YEAR_s', 'YY')
         ROLL = hit.get('ROLL_s', 'RRR')
         EXP = hit.get('EXP_s', 'EEE')
         SITE = hit.get('SITE_s', 'SSS')
-        FILEPATH = hit.get('FILEPATH_s', 'not an image')
-        if SITE not in 'NPW|NKH|NML|PL|KTK'.split('|'):
+        DIRECTION = hit.get('DIRECTION_s', 'DDD')
+        SKETCH = hit.get('SKETCH_s', 'KKK')
+        FILEPATH = hit.get('FILEPATH_s', 'not a file')
+        OP = hit.get('OP_s', 'OP')
+        if key_tno == '':
+            if SITE not in 'NPW|NKH|NML|PL|KTK'.split('|'):
+                try:
+                    SITE = SEASONS[YEAR]
+                except:
+                    SITE = 'SSS'
+                    YEAR = 'YY'
             try:
-                SITE = SEASONS[YEAR]
+                check = int(EXP)
             except:
-                SITE = 'SSS'
-                YEAR = 'YY'
-        try:
-            check = int(EXP)
-        except:
-            EXP = 'EEE'
-        try:
-            photo_key = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
-            # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
-        except:
-            photo_key = ''
-        if (ROLL == 'RRR' or EXP == 'EEE') and tno_key == '':
-            KEY_TYPES[dtype + ' Sequence'] += 1
-        else:
-            seq_key = ''
-            KEY_TYPES[dtype + ' SSS YY R E'] += 1
-        record_list.append([tno_key, photo_key, seq_key, dtype, hit])
-        if (SITE == 'SSS' or YEAR == 'YY') and tno_key == '':
-            print(f'vague key: {dtype}, "{tno_key}", "{photo_key}", "{seq_key}", {FILEPATH}')
-            # print(f'vague key: "{tno_key}", "{photo_key}", "{seq_key}", {dtype}', str(hit.values()))
-        if YEAR in YEARS and SITE in SITE:
+                EXP = 'EEE'
+            if DIRECTION != 'DDD' or SKETCH != 'KKK':
+                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {DIRECTION} {SKETCH}"
+                KEY_TYPES[dtype + ' OP DDD KKK'] += 1
+            elif ROLL != 'RRR' or EXP != 'EEE':
+                key_photo = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                KEY_TYPES[dtype + ' SSS YY R E'] += 1
+                # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+            else:
+                key_seq = ''
+                KEY_TYPES[dtype + ' SEQ'] += 1
+
+        record_list.append([key_tno, key_photo, key_seq, dtype, hit])
+        if [key_tno, key_photo, key_seq] == [''] * 3:
+            write_errors('empty keys', [hit[h] for h in OUTPUT_FIELDS if '_s' in h and h in hit and 'KEYTERMS' not in h])
+        if (SITE == 'SSS' or YEAR == 'YY') and key_tno == '':
+            write_errors(f'vague key', [dtype, key_tno, key_photo, key_seq, FILEPATH])
+        if YEAR in YEARS and SITE in LOCATIONS:
             DIST[YEAR][SITE] += 1
         else:
-            print(f'not found: "{SITE}" "{YEAR}"')
+            write_errors('site or season not found', [SITE, YEAR])
 
 # consolidate records on keys
 for r in record_list:
@@ -151,7 +175,7 @@ for r in record_list:
     elif r[2] != '':
         keys[r[2]].append(r)
     else:
-        print('problem', r)
+        write_errors('no key generated', [r[4][h] for h in OUTPUT_FIELDS if '_s' in h and h in r[4] and 'KEYTERMS' not in h])
 
 with open(output_file, 'w') as outputfile:
     csvoutput = csv.writer(outputfile, delimiter=delim, quoting=csv.QUOTE_MINIMAL)
@@ -176,14 +200,14 @@ with open(output_file, 'w') as outputfile:
             [output_arr.append(get_cell(r[4], f)) for f in ['DTYPE_s'] + OUTPUT_FIELDS]
             output_str = '%'.join(output_arr)
             if output_str in subrecord:
-                print('duplicate',key,r[0:4])
+                write_errors('duplicate record in set', [[key] + output_arr])
             subrecord.append(output_str)
             add_items(merged_records, r[4])
             OUTPUT_COUNT += 1
 
         record_count = sum([merged_records['DTYPES_ss'][d] for d in merged_records['DTYPES_ss']])
         if record_count > 100:
-            print('pathological merged record', key, title, merged_records['DTYPES_ss'])
+            write_errors('pathological merged record', [key, title, merged_records['DTYPES_ss']])
             continue
 
         output_record = [key, 'merged records', title,
@@ -242,5 +266,8 @@ for s in DIST:
             continue
         else:
             print(f'{s} {l} {DIST[s][l]}')
+
+for e in errors:
+    print(f'{e}: {errors[e]}')
 
 print()

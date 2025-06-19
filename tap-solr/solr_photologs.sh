@@ -9,16 +9,17 @@ cut -f1,2,5,6,7,8,10,12,13,14,15 ../tap-solr-data/TAP94-photolog.txt > ../tap-so
 # small repair to NML 94 photolog data
 perl -i -pe 's/\ttap\t/\tNML\t/' ../tap-solr-data/TAP94_photolog.csv
 
+# tidy up some stray characters, insert DYPTE, etc.
+#perl -i -pe 's/\xf1//;s/\xcd//g;s/\x0b//g;s/\xca/ /g;s/\r//g;s/\.0+\t/\t/g;' ../tap-solr-data/TAP*_photolog.csv
+# perl -i -p fix.pl ../tap-solr-data/TAP*_photolog.csv
+perl -i -pe 's/\t0\.0+\t/\t0\t/g;s/\.0+\t/\t/g;s/\r//g;s/\xe6/ /g;s/\xca/ /g;s/\x0b//g;s/^/photologs\t/;s/(nml|nkh|npw)/uc($1)/e;' ../tap-solr-data/TAP*_photolog.csv
+# fix up header
+perl -i -pe 'if (/^photologs\tT_/) {s/_//g;s/\t/_s\t/g;s/$/_s/;s/photologs/DTYPE/;s/92/YEAR/;s/\t\t/\tREVISION_D_s\t/;}' ../tap-solr-data/TAP*_photolog.csv
+
 iconv -f utf-8 -t utf-8 -c ../tap-solr-data/TAP86_photolog.csv > tmp; mv tmp ../tap-solr-data/TAP86_photolog.csv
 iconv -f utf-8 -t utf-8 -c ../tap-solr-data/TAP90_photolog.csv > tmp; mv tmp ../tap-solr-data/TAP90_photolog.csv
 iconv -f utf-8 -t utf-8 -c ../tap-solr-data/TAP92_photolog.csv > tmp; mv tmp ../tap-solr-data/TAP92_photolog.csv
 iconv -f utf-8 -t utf-8 -c ../tap-solr-data/TAP94_photolog.csv > tmp; mv tmp ../tap-solr-data/TAP94_photolog.csv
-
-# tidy up some stray characters, insert DYPTE, etc.
-#perl -i -pe 's/\xf1//;s/\xcd//g;s/\x0b//g;s/\xca/ /g;s/\r//g;s/\.0+\t/\t/g;' ../tap-solr-data/TAP*_photolog.csv
-# perl -i -p fix.pl ../tap-solr-data/TAP*_photolog.csv
-perl -i -pe 's/\.0+\t/\t/g;s/\r//g;s/\xe6/ /g;s/\x0B//g;s/^/photologs\t/;s/(nml|nkh|npw)/uc($1)/e;' ../tap-solr-data/TAP*_photolog.csv
-perl -i -pe 'if (/^photologs\tT_/) {s/_//g;s/\t/_s\t/g;s/$/_s/;s/photologs/DTYPE/;s/92/YEAR/;s/\t\t/\tREVISION_D_s\t/;}' ../tap-solr-data/TAP*_photolog.csv
 
 python3 assign_keyterms.py ../tap-solr-data/TAP86_photolog.csv tmp; mv tmp ../tap-solr-data/TAP86_photolog.csv
 python3 assign_keyterms.py ../tap-solr-data/TAP90_photolog.csv tmp; mv tmp ../tap-solr-data/TAP90_photolog.csv

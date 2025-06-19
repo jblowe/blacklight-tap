@@ -24,28 +24,28 @@ with open(input_file, 'r') as inputfile:
             elif file_format == 'images':
                 # (tap_dir, tap_id, derivative, stat, filepath) = row
                 (tap_id, dummy, media_type, source, derivative, filename_only, filepath, stat, filesize) = row
-                thumbnail = f'/images/{media_type}/{derivative}'
+                thumbnail = f'/images/{derivative}'
             imagename, filename = parse_image_filename(filepath)
 
             if i == 0:
-                header = 'dtype_s t_s roll_s exp_s op_s sq_s area_s lot_s fea_s reg_s burial_s etc_s site_s year_s ' + \
-                         'filename_s filepath_s thumbnail_s pattern_s stat_s, size_s'
+                header = 'dtype_s t_s roll_s exp_s op_s sq_s area_s lot_s fea_s reg_s burial_s direction_s sketch_s maps_s etc_s site_s year_s ' + \
+                         'filename_s filepath_s thumbnail_s pattern_s stat_s size_s'
                 header = re.sub(r'_S', '_s', header.upper()).split(' ')
                 csvoutput.writerow(header)
 
-            if 'OP1' in filepath:
+            if 'OP1' in filepath.upper():
                 # print(op)
                 pass
 
-            (dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc) = extract_fields(imagename,
-                                                                                                          filepath)
+            (dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc, direction, sketch, map) = \
+                extract_fields(imagename, filepath)
 
             if file_format == 'box':
                 dtype = 'box'
 
             output_record = [
                 dtype, tno,
-                roll, exp, op, sq, area, lot, fea, reg, bur, etc, site, season,
+                roll, exp, op, sq, area, lot, fea, reg, bur, direction, sketch, map, etc, site, season,
                 filename, filepath, thumbnail, pattern, stat, filesize
             ]
             csvoutput.writerow(output_record)

@@ -16,7 +16,7 @@ def convert(str, limit):
         if '.' in str:
             return str
         if int(str) > limit:
-            return str
+            return ''
         return int(str)
     except:
         return str
@@ -48,6 +48,7 @@ def parse_image_filename(filepath):
     # e.g. NKH_92_Ro_534.thumb.jpg
     imagename = re.sub(r'(Ro)[_ ]?(\d+)\-(\d+)', r'R\2_#\3', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'(Ro)[_ ]?(\d+)', r'R\2', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r'w(\d+)', r' W\1', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'(\d+)[#_](\d+)', r'\1_#\2', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bB ([\w, ]+)\b', r'B\1', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bOp (\w+)\b', r'Op\1', imagename, flags=re.IGNORECASE)
@@ -58,62 +59,80 @@ def parse_image_filename(filepath):
 
 
 def extract_fields(imagename, filepath):
-    (site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc) = [''] * 13
+    (site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc, direction, profile, map) = [''] * 16
 
-    parts = imagename.split('_')
-    for part in parts:
-        if 'TAP' == part.upper(): continue
-        # this next line must go first to match PL images
-        roll = match(r'\b([RL]\d+)', part, flags=0) if 'PL' in imagename and roll == '' else roll
-        roll = match(r'\bRo?l?l?(\d+\.?\d?)', part, flags=re.IGNORECASE) if roll == '' else roll
-        roll = match(r'\bR(\d+)[\-#]\d+', part, flags=re.IGNORECASE) if roll == '' else roll
-        exp = match(r'#(\d+)', part, flags=re.IGNORECASE) if exp == '' else exp
-        exp = match(r'\bR\d+[\-#](\d+)', part, flags=re.IGNORECASE) if exp == '' else exp
-        op = match(r'\bOp([\d+][\w]?)', part, flags=re.IGNORECASE) if op == '' else op
-        op = match(r'\bOp(\w+)\b', part, flags=re.IGNORECASE) if op == '' else op
-        sq = match(r'\bSq([\d\w]+)', part, flags=re.IGNORECASE) if sq == '' else sq
-        area = match(r'\bAr?e?a?(\w+)\b', part, flags=re.IGNORECASE) if area == '' else area
-        lot = match(r'Lot(\d+)', part, flags=re.IGNORECASE) if lot == '' else lot
-        fea = match(r'\bFe?a?t?(\d+)', part, flags=re.IGNORECASE) if fea == '' else fea
-        reg = match(r'\bReg?([\d\w]+)', part, flags=re.IGNORECASE) if reg == '' else reg
-        site = match(r'(NPW|NKH|NML|NKW|PL|KTK)', part, flags=re.IGNORECASE) if site == '' else site
-        tno = match(r'^T#?([\d]+[A-Z]*)', part, flags=re.IGNORECASE) if tno == '' else tno
-        bur = match(r'^\bBu?r?i?a?l?[# ]*([\d, ]+)', part, flags=re.IGNORECASE) if bur == '' else bur
-        season = match(r'Sea(\d+)', part, flags=re.IGNORECASE) if season == '' else season
-        season = match(r'\b(86|90|92|93|94)\b', part, flags=re.IGNORECASE) if season == '' else season
-        # print "p\t"
-
-    if 'IMG_' in imagename:
-        (roll, exp, bur) = [''] * 3
-
-    if 'Op B - B 3, 4.pdf' in filepath:
-        #print(filepath)
-        pass
-
-    roll = convert(roll, 300)
-    exp = convert(exp, 40)
-    tno = convert(tno, 40000)
-    site = site.upper()
-    area = area.upper()
-    op = op.upper()
-    sq = sq.upper()
-    etc = ''
-    if site == '':
-        for s in 'NPW|NKH|NML|NKW|PL|KTK'.split('|'):
-            if s in filepath:
-                site = s
-                break
-
-    if season == '':
-        for s in '86 90 92 93 94'.split(' '):
-            if f' {s} ' in filepath or f'TAP{s} ' in filepath.upper():
-                season = s
-                break
-
-    # polaroids: e.g. TAP 92 NKH1 015.tif
-    if 'polaroid' in filepath.lower():
-        dtype = 'polaroids'
+    if 'Isotope Project 2023' in filepath:
+        # e.g. 20230214_145319.jpg, just extract date portion
+        try:
+            etc = re.search(r'^(\d+)', imagename)[0]
+        except:
+            etc = imagename
+        site = 'isotope'
+        dtype = 'isotope'
     else:
-        dtype = 'images'
+        parts = imagename.split('_')
+        for part in parts:
+            if 'TAP' == part.upper(): continue
+            # this next line must go first to match PL images
+            roll = match(r'\b([RL]\d+)', part, flags=0) if 'PL' in imagename and roll == '' else roll
+            roll = match(r'\bRo?l?l?(\d+\.?\d?)', part, flags=re.IGNORECASE) if roll == '' else roll
+            roll = match(r'\bR(\d+)[\-#]\d+', part, flags=re.IGNORECASE) if roll == '' else roll
+            exp = match(r'#(\d+)', part, flags=re.IGNORECASE) if exp == '' else exp
+            exp = match(r'\bR\d+[\-#](\d+)', part, flags=re.IGNORECASE) if exp == '' else exp
+            op = match(r'\bOp([\d+][\w]?)', part, flags=re.IGNORECASE) if op == '' else op
+            op = match(r'\bOp(\w+)\b', part, flags=re.IGNORECASE) if op == '' else op
+            sq = match(r'\bSq([\d\w]+)', part, flags=re.IGNORECASE) if sq == '' else sq
+            area = match(r'\bAr?e?a?(\w+)\b', part, flags=re.IGNORECASE) if area == '' else area
+            lot = match(r'Lot(\d+)', part, flags=re.IGNORECASE) if lot == '' else lot
+            fea = match(r'\bFe?a?t?(\d+)', part, flags=re.IGNORECASE) if fea == '' else fea
+            reg = match(r'\bReg?([\d\w]+)', part, flags=re.IGNORECASE) if reg == '' else reg
+            site = match(r'(NPW|NKH|NML|NKW|PL|KTK)', part, flags=re.IGNORECASE) if site == '' else site
+            tno = match(r'^T#?([\d]+[A-Z]*)', part, flags=re.IGNORECASE) if tno == '' else tno
+            bur = match(r'^\bBu?r?i?a?l?[# ]*([\d, \-]+)', part, flags=re.IGNORECASE) if bur == '' else bur
+            season = match(r'Sea([\dK]+)', part, flags=re.IGNORECASE) if season == '' else season
+            season = match(r'\b(86|90|92|93|94|2K8)\b', part, flags=0) if season == '' else season
+            direction = match(r'(east|west|north|south)', part, flags=re.IGNORECASE) if direction == '' else direction
+            profile = match(r'(balk|baulk|profile|section)', part, flags=re.IGNORECASE) if profile == '' else profile
+            map = match(r'(map|plan)', part, flags=re.IGNORECASE) if map == '' else map
 
-    return dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc
+        if 'IMG_' in imagename:
+            (roll, exp, bur) = [''] * 3
+
+        if 'Op B - B 3, 4.pdf' in filepath:
+            #print(filepath)
+            pass
+
+        if direction != '':
+            #print(filepath)
+            pass
+
+        roll = convert(roll, 300)
+        exp = convert(exp, 40)
+        tno = convert(tno, 40000)
+        site = site.upper()
+        area = area.upper()
+        op = op.upper()
+        sq = sq.upper()
+        direction = direction.lower()
+        if profile != '': profile = 'profile'
+        if map != '': map = 'map'
+        etc = ''
+        if site == '':
+            for s in 'NPW|NKH|NML|NKW|PL|KTK'.split('|'):
+                if s in filepath:
+                    site = s
+                    break
+
+        if season == '':
+            for s in '86 90 92 93 94'.split(' '):
+                if f' {s} ' in filepath or f'TAP{s} ' in filepath.upper():
+                    season = s
+                    break
+
+        # polaroids: e.g. TAP 92 NKH1 015.tif
+        if 'polaroid' in filepath:
+            dtype = 'polaroids'
+        else:
+            dtype = 'images'
+
+    return dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, direction, profile, map, etc

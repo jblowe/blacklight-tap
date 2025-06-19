@@ -12,8 +12,8 @@ delim = '\t'
 
 DOCS = 'SCHEMATIC SCANS SCAN PROFILES PROFILE REPORTS REPORT GRAPHS GRAPH SUMMARIES SUMMARY FORMS FORM NOTEBOOKS NOTEBOOK MAPS MAP SKETCHES SKETCH BURIAL BURIALS'.lower().split(' ')
 
-title_labels = 't,site,year,roll,exp,op,sq,area,lot,fea,reg,bur,etc'.split(',')
-extras = 'material,class,notes,description,date'.split(',')
+title_labels = 't,site,year,roll,exp,op,sq,area,lot,fea,reg,burial'.split(',')
+extras = 'direction,profile,map,etc,material,class,notes,description,date'.split(',')
 
 def get_index(lst,fld):
     pass
@@ -44,19 +44,20 @@ def extract_title(row, header):
 def extract_terms(val):
     possible_string = val.replace('/Users/johnlowe/Box Sync/TAP Collaborations/', '')
     #possible_terms = re.split(r"[,\s;\/\._%\|\)\(\]\[]+", possible_string)
-    possible_terms = re.split(r"[\W_]+", possible_string)
+    possible_terms = re.split(r"[\W_]+", possible_string.lower())
     keyterms = set()
-    document_type = set()
+    document_types = set()
     for p in possible_terms:
         if p == '': continue
-        if p in 'johnlowe,Users,TAP,Box,Sync,Photos'.split(','):
+        if p in 'johnlowe,users,tag,box,sync'.split(','):
             continue
-        p = p.lower()
         p = re.sub(r'e?s$', '', p)
-        if p in DOCS: document_type.add(p)
+        if p in DOCS: document_types.add(p)
+    if ('burial' in val.lower() or re.search(r' Bu\d+', val) is not None) and 'burial' not in document_types:
+        document_types.add('burial')
     [keyterms.add(x.lower()) for x in possible_terms]
     #print(possible_string,'\n',keyterms,'\n', DOC)
-    return keyterms, document_type
+    return keyterms, document_types
 
 
 header = []
