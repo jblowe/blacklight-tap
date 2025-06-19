@@ -115,8 +115,8 @@ class CatalogController < ApplicationController
     config.autocomplete_path = 'suggest'
 
     # FACET FIELDS
-     # config.add_facet_field 'DTYPE_s', label: 'Doc type', limit: true
-     config.add_facet_field 'DTYPES_ONLY_ss', label: 'Doc types', limit: true
+     # config.add_facet_field 'DTYPE_s', label: 'Record type', limit: true
+     config.add_facet_field 'DTYPES_ONLY_ss', label: 'Record types', limit: true
      config.add_facet_field 'T_s', label: 'T#', limit: true
      config.add_facet_field 'KEY_s', label: 'KEY', limit: true
      # config.add_facet_field 'T_i', label: 'T numeric', limit: true
@@ -138,6 +138,7 @@ class CatalogController < ApplicationController
      config.add_facet_field 'EXCAVATOR_s', label: 'EXCAVATOR', limit: true
      config.add_facet_field 'FEA_s', label: 'FEA', limit: true
      config.add_facet_field 'NOTES2_s', label: 'NOTES2', limit: true
+     config.add_facet_field 'DOC_ss', label: 'Doc type', limit: true
      config.add_facet_field 'OBJ_s', label: 'OBJ', limit: true
      config.add_facet_field 'PHOTOTYPE_s', label: 'PHOTOTYPE', limit: true
      config.add_facet_field 'REG_s', label: 'REG', limit: true
@@ -165,11 +166,12 @@ class CatalogController < ApplicationController
      config.add_index_field 'MATERIAL_s', label: 'MATERIAL'
      config.add_index_field 'DATE_s', label: 'DATE'
      config.add_index_field 'TRAY_s', label: 'TRAY'
+     config.add_index_field 'DOC_ss', label: 'Doc type'
 
      config.add_index_field 'REVISIOND_s', label: 'REVISIOND'
      config.add_index_field 'DUPLICATED_s', label: 'DUPLICATED'
      config.add_index_field 'EXCAVATOR_s', label: 'EXCAVATOR'
-     config.add_index_field 'DTYPES_ss', label: 'Doc types'
+     config.add_index_field 'DTYPES_ss', label: 'File types'
      config.add_index_field 'RECORDS_ss', helper_method: 'render_records', label: 'Records'
      config.add_index_field 'IMAGES_ss', helper_method: 'render_images', label: 'Images'
      config.add_index_field 'FILENAMES_ss', helper_method: 'render_filenames', label: 'Filenames'
@@ -179,7 +181,7 @@ class CatalogController < ApplicationController
      config.add_index_field 'FILEPATH_s', helper_method: 'render_image_link', label: 'MEDIA'
      config.add_index_field 'FILENAME_s', label: 'FILENAME'
      # config.add_index_field 'THUMBNAIL_s', label: 'THUMB'
-     # config.add_index_field 'DTYPE_s', label: 'DTYPE'
+     config.add_index_field 'DTYPE_s', label: 'DTYPE'
 
 
     # SHOW DISPLAY
@@ -207,7 +209,7 @@ class CatalogController < ApplicationController
      config.add_show_field 'WEIGHT_s', label: 'WEIGHT'
      config.add_show_field 'PHOTOTYPE_s', label: 'PHOTOTYPE'
      config.add_show_field 'REG_s', label: 'REG'
-     # config.add_show_field 'DTYPE_s', label: 'DTYPE'
+     config.add_show_field 'DTYPE_s', label: 'DTYPE'
      config.add_show_field 'BURIAL_s', label: 'BURIAL'
      config.add_show_field 'B_s', label: 'B'
      config.add_show_field 'CLASS_s', label: 'CLASS'
@@ -219,6 +221,7 @@ class CatalogController < ApplicationController
      config.add_show_field 'UNKNOWN_s', label: 'UNKNOWN'
      config.add_show_field 'ETC_s', label: 'ETC'
      config.add_show_field 'TRAY_s', label: 'TRAY'
+     config.add_show_field 'DOC_ss', label: 'Doc type'
      config.add_show_field 'FILENAME_s', label: 'FILEPATH'
      config.add_show_field 'IMAGENAME_s', label: 'FILENAME'
      config.add_show_field 'KEYTERMS_s', label: 'KEYTERMS'
