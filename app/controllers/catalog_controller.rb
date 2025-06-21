@@ -114,6 +114,11 @@ class CatalogController < ApplicationController
     config.autocomplete_enabled = false
     config.autocomplete_path = 'suggest'
 
+    # config.view.gallery.partials = [:gallery]
+    # config.view.gallery.document_component = GalleryDocumentComponent
+    # config.view.gallery.add_gallery_field 'KEY_s', label: 'Title'
+
+
     # FACET FIELDS
      # config.add_facet_field 'DTYPE_s', label: 'Record type', limit: true
      config.add_facet_field 'DTYPES_ONLY_ss', label: 'Record types', limit: true
@@ -172,16 +177,16 @@ class CatalogController < ApplicationController
      config.add_index_field 'DUPLICATED_s', label: 'DUPLICATED'
      config.add_index_field 'EXCAVATOR_s', label: 'EXCAVATOR'
      config.add_index_field 'DTYPES_ss', label: 'File types'
-     config.add_index_field 'RECORDS_ss', helper_method: 'render_records', label: 'Records'
+     # config.add_index_field 'RECORDS_ss', helper_method: 'render_records', label: 'Records'
      config.add_index_field 'IMAGES_ss', helper_method: 'render_images', label: 'Images'
-     config.add_index_field 'FILENAMES_ss', helper_method: 'render_filenames', label: 'Filenames'
+     # config.add_index_field 'FILENAMES_ss', helper_method: 'render_filenames', label: 'Filenames'
      # config.add_index_field 'PHOTOTYPE_s', label: 'PHOTOTYPE'
      # config.add_index_field 'REG_s', label: 'REG'
-     config.add_index_field 'KEYTERMS_s', label: 'KEYTERMS'
      config.add_index_field 'FILEPATH_s', helper_method: 'render_image_link', label: 'MEDIA'
      config.add_index_field 'FILENAME_s', label: 'FILENAME'
      # config.add_index_field 'THUMBNAIL_s', label: 'THUMB'
-     config.add_index_field 'DTYPE_s', label: 'DTYPE'
+     # config.add_index_field 'KEYTERMS_ss', label: 'KEYTERMS'
+     # config.add_index_field 'DTYPE_s', label: 'DTYPE'
 
 
     # SHOW DISPLAY
@@ -211,7 +216,6 @@ class CatalogController < ApplicationController
      config.add_show_field 'REG_s', label: 'REG'
      config.add_show_field 'DTYPE_s', label: 'DTYPE'
      config.add_show_field 'BURIAL_s', label: 'BURIAL'
-     config.add_show_field 'B_s', label: 'B'
      config.add_show_field 'CLASS_s', label: 'CLASS'
      config.add_show_field 'COUNT_s', label: 'COUNT'
      config.add_show_field 'ENTRY_DATE_s', label: 'ENTRY_DATE'
@@ -224,10 +228,10 @@ class CatalogController < ApplicationController
      config.add_show_field 'DOC_ss', label: 'Doc type'
      config.add_show_field 'FILENAME_s', label: 'FILEPATH'
      config.add_show_field 'IMAGENAME_s', label: 'FILENAME'
-     config.add_show_field 'KEYTERMS_s', label: 'KEYTERMS'
+     config.add_show_field 'KEYTERMS_ss', label: 'KEYTERMS'
      config.add_show_field 'RECORDS_ss', helper_method: 'render_records', label: 'RECORDS'
      config.add_show_field 'IMAGES_ss', helper_method: 'render_images', label: 'Images'
-     #config.add_show_field 'FILENAMES_ss', helper_method: 'render_filenames', label: 'Filenames'
+     config.add_show_field 'FILENAMES_ss', helper_method: 'render_filenames', label: 'Filenames'
 
 
     # SORT FIELDS
