@@ -118,11 +118,11 @@ for i, dtype in enumerate(DTYPES):
                 try:
                     key_tno = str(int(hit['T_s']))
                     # tno_key = tno_key if 'T' not in tno_key else f'T{tno_key}'
-                    hit['T_s'] = key_tno
+                    hit['T_s'] = f'{key_tno}' if 'T' == key_tno[0] else f'T{key_tno}'
                     KEY_TYPES[dtype + ' Tno'] += 1
                 except:
                     write_errors('non-numeric T#', [hit['T_s']])
-                    key_tno = ''
+                    key_tno = hit['T_s']
             else:
                 key_tno = ''
         # we didn't find a tno key. check if we can make another
@@ -180,7 +180,7 @@ for r in record_list:
 with open(output_file, 'w') as outputfile:
     csvoutput = csv.writer(outputfile, delimiter=delim, quoting=csv.QUOTE_MINIMAL)
     FIELD_LIST = sorted(FIELDS)
-    header = 'KEY_s DTYPE_s TITLE_s DTYPES_ss DTYPES_ONLY_ss RECORDS_ss IMAGES_ss FILENAMES_ss'.split(' ')
+    header = 'id KEY_s DTYPE_s TITLE_s DTYPES_ss DTYPES_ONLY_ss RECORDS_ss IMAGES_ss FILENAMES_ss'.split(' ')
     csvoutput.writerow(header + OUTPUT_FIELDS)
     # generate merged records as csv fields
     for key in keys:
@@ -210,7 +210,9 @@ with open(output_file, 'w') as outputfile:
             write_errors('pathological merged record', [key, title, merged_records['DTYPES_ss']])
             continue
 
-        output_record = [key, 'merged records', title,
+        if 'TT' in key:
+            pass
+        output_record = [key.replace(' ','_'), key, 'merged records', title,
                          format_dtypes(merged_records['DTYPES_ss']),
                          format_dtypes_only(merged_records['DTYPES_ss']),
                          '|'.join(subrecord),

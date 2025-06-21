@@ -6,6 +6,10 @@ import re
 from image_fn import parse_image_filename, extract_fields
 
 input_file = sys.argv[1]
+# parse input filename to get info for id
+id_info = re.match(r'.*/TAP(\d+)?_(\w+)\.', input_file)
+id_year = id_info[1] if id_info[1] is not None else ''
+id_prefix = id_info[2]
 output_file = sys.argv[2]
 rows = 100000
 delim = '\t'
@@ -26,7 +30,7 @@ def extract_title(row, header):
             n = header.index(label.upper()+'_s')
         except:
             continue
-        if label in 'site year'.split(' '):
+        if label in 'site year t'.split(' '):
             title = title + f'{row[n]} '
         else:
             if row[n] != '':
@@ -39,7 +43,7 @@ def extract_title(row, header):
             continue
         if row[n] not in title:
             title = title + f'{row[n]} '
-    return title
+    return title.replace('/','_').replace('#','_').strip()
 
 def extract_terms(val):
     possible_string = val.replace('/Users/johnlowe/Box Sync/TAP Collaborations/', '')
@@ -65,12 +69,21 @@ with open(input_file) as inputfile:
     csvinput = csv.reader(inputfile, delimiter=delim, quoting=csv.QUOTE_NONE, quotechar=chr(255))
     with open(output_file, 'w') as outputfile:
         csvoutput = csv.writer(outputfile, delimiter=delim, quoting=csv.QUOTE_NONE, quotechar=chr(255))
-        for i, row in enumerate(csvinput):
+        for row_count, row in enumerate(csvinput):
             keyterms, doc = extract_terms(' '.join(row))
             title_string = extract_title(row, header)
             keyterm_string = '|'.join([x for x in keyterms if x != ''])
             doc_string = '|'.join([x for x in doc if x != ''])
-            if i == 0:
+            if row_count == 0:
+                try:
+                    dtype_column= row.index('DTYPE_s')
+                except:
+                    print('DTYPE undetected', row)
+                # add an id column if there isn't one
+                if row[0] == 'id':
+                    has_id = True
+                else:
+                    has_id = False
                 title_string = 'TITLE_s'
                 keyterm_string = 'KEYTERMS_ss'
                 doc_string = 'DOC_ss'
@@ -81,5 +94,15 @@ with open(input_file) as inputfile:
                 except:
                     pass
                 header = row
+                id = 'id'
+            else:
+                if id_prefix in ['merged']:
+                    id = title_string.replace(' ', '_')
+                else:
+                    id = id_prefix + id_year + str(row_count)
+            if has_id:
+                row[0] = id
+            else:
+                row = [id] + row
             csvoutput.writerow(row + [title_string, keyterm_string, doc_string])
 

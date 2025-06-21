@@ -36,6 +36,7 @@ def parse_image_filename(filepath):
     # Obj# 22
     # R##566D5
     imagename = re.sub(r', ', r',', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r'tif\.tif', r'.tif', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'R##([\d\w]+)', r'Reg\1', imagename, flags=re.IGNORECASE)
 
     imagename = re.sub(r'^Tap[_\- ]?', 'Sea', imagename, flags=re.IGNORECASE)
@@ -52,6 +53,8 @@ def parse_image_filename(filepath):
     imagename = re.sub(r'(\d+)[#_](\d+)', r'\1_#\2', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bB ([\w, ]+)\b', r'B\1', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bOp (\w+)\b', r'Op\1', imagename, flags=re.IGNORECASE)
+    # NKH1 069, etc.
+    imagename = re.sub(r'(NPW|NKH|NML|NKW|PL|KTK)(\d+) (\d+)', r'\1 Op\2 polaroid\3', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'^(NPW|NKH|NML|NKW|PL|KTK) ?(\d+)', r'Sea\2 \1', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r' ', '_', imagename)
 
@@ -59,7 +62,7 @@ def parse_image_filename(filepath):
 
 
 def extract_fields(imagename, filepath):
-    (site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc, direction, profile, map) = [''] * 16
+    (site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc, direction, profile, mxp) = [''] * 16
 
     if 'Isotope Project 2023' in filepath:
         # e.g. 20230214_145319.jpg, just extract date portion
@@ -88,12 +91,13 @@ def extract_fields(imagename, filepath):
             reg = match(r'\bReg?([\d\w]+)', part, flags=re.IGNORECASE) if reg == '' else reg
             site = match(r'(NPW|NKH|NML|NKW|PL|KTK)', part, flags=re.IGNORECASE) if site == '' else site
             tno = match(r'^T#?([\d]+[A-Z]*)', part, flags=re.IGNORECASE) if tno == '' else tno
+            bur = match(r'^Burial[# ]*([\d, \-]+)', part, flags=re.IGNORECASE) if bur == '' else bur
             bur = match(r'^\bBu?r?i?a?l?[# ]*([\d, \-]+)', part, flags=re.IGNORECASE) if bur == '' else bur
             season = match(r'Sea([\dK]+)', part, flags=re.IGNORECASE) if season == '' else season
             season = match(r'\b(86|90|92|93|94|2K8)\b', part, flags=0) if season == '' else season
             direction = match(r'(east|west|north|south)', part, flags=re.IGNORECASE) if direction == '' else direction
             profile = match(r'(balk|baulk|profile|section)', part, flags=re.IGNORECASE) if profile == '' else profile
-            map = match(r'(map|plan)', part, flags=re.IGNORECASE) if map == '' else map
+            mxp = match(r'(map|plan)', part, flags=re.IGNORECASE) if mxp == '' else mxp
 
         if 'IMG_' in imagename:
             (roll, exp, bur) = [''] * 3
@@ -114,8 +118,9 @@ def extract_fields(imagename, filepath):
         op = op.upper()
         sq = sq.upper()
         direction = direction.lower()
+        if fea == '0': fea = ''
         if profile != '': profile = 'profile'
-        if map != '': map = 'map'
+        if mxp != '': mxp = 'map'
         etc = ''
         if site == '':
             for s in 'NPW|NKH|NML|NKW|PL|KTK'.split('|'):
@@ -128,11 +133,18 @@ def extract_fields(imagename, filepath):
                 if f' {s} ' in filepath or f'TAP{s} ' in filepath.upper():
                     season = s
                     break
-
+        # check if season is within range
+        try:
+            season_check = int(season)
+            if season_check > 94 or season_check < 86:
+                etc += season
+                season = ''
+        except:
+            pass
         # polaroids: e.g. TAP 92 NKH1 015.tif
         if 'polaroid' in filepath:
             dtype = 'polaroids'
         else:
             dtype = 'images'
 
-    return dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, direction, profile, map, etc
+    return dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, direction, profile, mxp, etc

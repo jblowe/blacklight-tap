@@ -37,15 +37,21 @@ with open(input_file, 'r') as inputfile:
                 # print(op)
                 pass
 
-            (dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc, direction, sketch, map) = \
+            (dtype, site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, direction, profile, mxp, etc) = \
                 extract_fields(imagename, filepath)
+
+            if dtype == 'isotope':
+                pass
 
             if file_format == 'box':
                 dtype = 'box'
 
+            # reduce image info
+            stat = stat.split(',')[0]
+
             output_record = [
                 dtype, tno,
-                roll, exp, op, sq, area, lot, fea, reg, bur, direction, sketch, map, etc, site, season,
+                roll, exp, op, sq, area, lot, fea, reg, bur, direction, profile, mxp, etc, site, season,
                 filename, filepath, thumbnail, pattern, stat, filesize
             ]
             csvoutput.writerow(output_record)
