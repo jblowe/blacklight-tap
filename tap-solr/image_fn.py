@@ -53,6 +53,7 @@ def parse_image_filename(filepath):
     imagename = re.sub(r'(\d+)[#_](\d+)', r'\1_#\2', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bB ([\w, ]+)\b', r'B\1', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bOp (\w+)\b', r'Op\1', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r'\bR#+', 'R#', imagename, flags=re.IGNORECASE)
     # NKH1 069, etc.
     imagename = re.sub(r'(NPW|NKH|NML|NKW|PL|KTK)(\d+) (\d+)', r'\1 Op\2 polaroid\3', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'^(NPW|NKH|NML|NKW|PL|KTK) ?(\d+)', r'Sea\2 \1', imagename, flags=re.IGNORECASE)
@@ -88,7 +89,7 @@ def extract_fields(imagename, filepath):
             area = match(r'\bAr?e?a?(\w+)\b', part, flags=re.IGNORECASE) if area == '' else area
             lot = match(r'Lot(\d+)', part, flags=re.IGNORECASE) if lot == '' else lot
             fea = match(r'\bFe?a?t?(\d+)', part, flags=re.IGNORECASE) if fea == '' else fea
-            reg = match(r'\bReg?([\d\w]+)', part, flags=re.IGNORECASE) if reg == '' else reg
+            reg = match(r'\bRe?g?#([\d\w]+)', part, flags=0) if reg == '' else reg
             site = match(r'(NPW|NKH|NML|NKW|PL|KTK)', part, flags=re.IGNORECASE) if site == '' else site
             tno = match(r'^T#?([\d]+[A-Z]*)', part, flags=re.IGNORECASE) if tno == '' else tno
             bur = match(r'^Burial[# ]*([\d, \-]+)', part, flags=re.IGNORECASE) if bur == '' else bur
@@ -112,7 +113,7 @@ def extract_fields(imagename, filepath):
 
         roll = convert(roll, 300)
         exp = convert(exp, 40)
-        tno = convert(tno, 40000)
+        tno = convert(tno, 60000)
         site = site.upper()
         area = area.upper()
         op = op.upper()
@@ -141,6 +142,10 @@ def extract_fields(imagename, filepath):
                 season = ''
         except:
             pass
+
+        if site == 'PL':
+            season = '85'
+
         # polaroids: e.g. TAP 92 NKH1 015.tif
         if 'polaroid' in filepath:
             dtype = 'polaroids'

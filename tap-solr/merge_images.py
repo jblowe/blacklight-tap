@@ -12,7 +12,7 @@ delim = '\t'
 
 # nb: DTYPE_s is handled specially further down; THUMBNAIL and FILENAME eliminated -- redundant
 OUTPUT_FIELDS = 'T_s SITE_s YEAR_s OP_s SQ_s LOT_s ROLL_s EXP_s AREA_s TRAY_s LEVEL_s MATERIAL_s NOTES_s STRATUM_s CLASS_s ' + \
-                'IMAGENAME_s BURIAL_s COUNT_s DIRECTORY_s DTYPES_ONLY_ss DTYPES_ss DOC_ss' + \
+                'IMAGENAME_s BURIAL_s COUNT_s DIRECTORY_s DTYPES_ONLY_ss DTYPES_ss DOC_ss ' + \
                 'ENTRY_DATE_s ETC_s EXCAVATIONDATE_s EXCAVATOR_s FEATURE__s FEA_s ' + \
                 'FILENAMES_ss IMAGES_ss KEYTERMS_ss ' + \
                 'RECORDS_ss REGISTRAR_s REG_s SEASON_s ' + \
@@ -133,7 +133,9 @@ for i, dtype in enumerate(DTYPES):
         DIRECTION = hit.get('DIRECTION_s', 'DDD')
         SKETCH = hit.get('SKETCH_s', 'KKK')
         FILEPATH = hit.get('FILEPATH_s', 'not a file')
-        OP = hit.get('OP_s', 'OP')
+        OP = hit.get('OP_s', '')
+        SQ = hit.get('SQ_s', '')
+        BU = hit.get('BURIAL_s', '')
         if key_tno == '':
             if SITE not in 'NPW|NKH|NML|PL|KTK'.split('|'):
                 try:
@@ -152,6 +154,9 @@ for i, dtype in enumerate(DTYPES):
                 key_photo = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
                 KEY_TYPES[dtype + ' SSS YY R E'] += 1
                 # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+            elif (OP + SQ + BU) != '':
+                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {BU}"
+                KEY_TYPES[dtype + ' SSS YY OP/SQ BU'] += 1
             else:
                 key_seq = ''
                 KEY_TYPES[dtype + ' SEQ'] += 1
@@ -165,6 +170,8 @@ for i, dtype in enumerate(DTYPES):
             DIST[YEAR][SITE] += 1
         else:
             write_errors('site or season not found', [SITE, YEAR])
+        if 'FILENAME_s' in hit and 'TAP 92 NPW OP7 B1' in hit['FILENAME_s']:
+            pass
 
 # consolidate records on keys
 for r in record_list:

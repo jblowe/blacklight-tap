@@ -93,6 +93,12 @@ with open(input_file) as inputfile:
                     row[n] = 'TITLE2_s'
                 except:
                     pass
+                # rename DOC_ss if it already exists in incoming data
+                try:
+                    n = row.index('DOC_ss')
+                    row[n] = 'DOC2_ss'
+                except:
+                    pass
                 header = row
                 id = 'id'
             else:
