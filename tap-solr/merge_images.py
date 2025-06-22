@@ -155,7 +155,7 @@ for i, dtype in enumerate(DTYPES):
                 KEY_TYPES[dtype + ' SSS YY R E'] += 1
                 # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
             elif (OP + SQ + BU) != '':
-                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {BU}"
+                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {BU}".replace('  ',' ').replace('  ',' ')
                 KEY_TYPES[dtype + ' SSS YY OP/SQ BU'] += 1
             else:
                 key_seq = ''

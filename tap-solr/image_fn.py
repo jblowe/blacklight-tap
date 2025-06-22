@@ -37,7 +37,7 @@ def parse_image_filename(filepath):
     # R##566D5
     imagename = re.sub(r', ', r',', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'tif\.tif', r'.tif', imagename, flags=re.IGNORECASE)
-    imagename = re.sub(r'R##([\d\w]+)', r'Reg\1', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r'R##*([\d\w]+)', r'Reg\1', imagename, flags=re.IGNORECASE)
 
     imagename = re.sub(r'^Tap[_\- ]?', 'Sea', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'(.*)\..+?$', r'\1', imagename, flags=re.IGNORECASE)  # get rid of extension
@@ -78,6 +78,7 @@ def extract_fields(imagename, filepath):
         for part in parts:
             if 'TAP' == part.upper(): continue
             # this next line must go first to match PL images
+            roll = match(r'\bRol(.*?)\b', part, flags=0) if roll == '' else roll
             roll = match(r'\b([RL]\d+)', part, flags=0) if 'PL' in imagename and roll == '' else roll
             roll = match(r'\bRo?l?l?(\d+\.?\d?)', part, flags=re.IGNORECASE) if roll == '' else roll
             roll = match(r'\bR(\d+)[\-#]\d+', part, flags=re.IGNORECASE) if roll == '' else roll
@@ -106,6 +107,10 @@ def extract_fields(imagename, filepath):
         if 'Op B - B 3, 4.pdf' in filepath:
             #print(filepath)
             pass
+        if '47' in roll:
+            #print(filepath)
+            pass
+
 
         if direction != '':
             #print(filepath)
