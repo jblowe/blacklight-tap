@@ -186,7 +186,7 @@ class CatalogController < ApplicationController
      config.add_index_field 'FILENAME_s', label: 'FILENAME'
      # config.add_index_field 'THUMBNAIL_s', label: 'THUMB'
      # config.add_index_field 'KEYTERMS_ss', label: 'KEYTERMS'
-     # config.add_index_field 'DTYPE_s', label: 'DTYPE'
+     config.add_index_field 'DTYPE_s', label: 'DTYPE'
 
 
     # SHOW DISPLAY
