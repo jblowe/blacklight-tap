@@ -125,7 +125,7 @@ for i, dtype in enumerate(DTYPES):
                     key_tno = hit['T_s']
             else:
                 key_tno = ''
-        # we didn't find a tno key. check if we can make another
+        SEASON = hit.get('SEASON_s', 'SS')
         YEAR = hit.get('YEAR_s', 'YY')
         ROLL = hit.get('ROLL_s', 'RRR')
         EXP = hit.get('EXP_s', 'EEE')
@@ -150,16 +150,22 @@ for i, dtype in enumerate(DTYPES):
             if DIRECTION != 'DDD' or SKETCH != 'KKK':
                 key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {DIRECTION} {SKETCH}"
                 KEY_TYPES[dtype + ' OP DDD KKK'] += 1
-            elif ROLL != 'RRR' or EXP != 'EEE':
-                key_photo = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
-                KEY_TYPES[dtype + ' SSS YY R E'] += 1
+            elif ROLL != 'RRR' and EXP != 'EEE':
+                key_photo = f"{SEASON} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                KEY_TYPES[dtype + ' SS R E'] += 1
                 # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
             elif (OP + SQ + BU) != '':
                 key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {BU}".replace('  ',' ').replace('  ',' ')
                 KEY_TYPES[dtype + ' SSS YY OP/SQ BU'] += 1
+            elif ROLL != 'RRR' or EXP != 'EEE':
+                key_photo = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                KEY_TYPES[dtype + ' SSS YY R E'] += 1
             else:
                 key_seq = ''
                 KEY_TYPES[dtype + ' SEQ'] += 1
+
+        if key_photo == 'SS 010 010':
+            pass
 
         record_list.append([key_tno, key_photo, key_seq, dtype, hit])
         if [key_tno, key_photo, key_seq] == [''] * 3:
@@ -217,8 +223,9 @@ with open(output_file, 'w') as outputfile:
             write_errors('pathological merged record', [key, title, merged_records['DTYPES_ss']])
             continue
 
-        if 'TT' in key:
+        if key == 'SS 010 010':
             pass
+
         output_record = [key.replace(' ','_'), key, 'merged records', title,
                          format_dtypes(merged_records['DTYPES_ss']),
                          format_dtypes_only(merged_records['DTYPES_ss']),

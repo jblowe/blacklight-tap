@@ -56,7 +56,7 @@ def parse_image_filename(filepath):
     imagename = re.sub(r'\bR#+', 'R#', imagename, flags=re.IGNORECASE)
     # NKH1 069, etc.
     imagename = re.sub(r'(NPW|NKH|NML|NKW|PL|KTK)(\d+) (\d+)', r'\1 Op\2 polaroid\3', imagename, flags=re.IGNORECASE)
-    imagename = re.sub(r'^(NPW|NKH|NML|NKW|PL|KTK) ?(\d+)', r'Sea\2 \1', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r'^(Tap|NPW|NKH|NML|NKW|PL|KTK) ?(\d+)', r'Sea\2 \1', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r' ', '_', imagename)
 
     return imagename, filename
@@ -78,7 +78,7 @@ def extract_fields(imagename, filepath):
         for part in parts:
             if 'TAP' == part.upper(): continue
             # this next line must go first to match PL images
-            roll = match(r'\bRol(.*?)\b', part, flags=0) if roll == '' else roll
+            roll = match(r'\bRol([\d\.AB]+)\b', part, flags=0) if roll == '' else roll
             roll = match(r'\b([RL]\d+)', part, flags=0) if 'PL' in imagename and roll == '' else roll
             roll = match(r'\bRo?l?l?(\d+\.?\d?)', part, flags=re.IGNORECASE) if roll == '' else roll
             roll = match(r'\bR(\d+)[\-#]\d+', part, flags=re.IGNORECASE) if roll == '' else roll
@@ -107,7 +107,17 @@ def extract_fields(imagename, filepath):
         if 'Op B - B 3, 4.pdf' in filepath:
             #print(filepath)
             pass
-        if '47' in roll:
+        if '13.1' in roll:
+            #print(filepath)
+            pass
+
+        if '47A' in roll:
+            roll = '47'
+        if '47B' in roll:
+            roll = '47.2'
+
+
+        if '13.1' in roll:
             #print(filepath)
             pass
 

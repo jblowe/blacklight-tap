@@ -28,7 +28,7 @@ with open(input_file, 'r') as inputfile:
             imagename, filename = parse_image_filename(filepath)
 
             if i == 0:
-                header = 'dtype_s t_s roll_s exp_s op_s sq_s area_s lot_s fea_s reg_s burial_s direction_s sketch_s maps_s etc_s site_s year_s ' + \
+                header = 'dtype_s t_s roll_s exp_s op_s sq_s area_s lot_s fea_s reg_s burial_s direction_s sketch_s maps_s etc_s site_s season_s ' + \
                          'filename_s filepath_s thumbnail_s pattern_s stat_s size_s'
                 header = re.sub(r'_S', '_s', header.upper()).split(' ')
                 csvoutput.writerow(header)

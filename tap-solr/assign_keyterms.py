@@ -31,7 +31,7 @@ def extract_title(row, header):
         except:
             continue
         if label in 'site year t'.split(' '):
-            title = title + f'{row[n]} '
+            title = title + f'{row[n].upper()} '
         else:
             if row[n] != '':
                 title = title + f'{label.capitalize()[:2]}{row[n]} '
@@ -103,7 +103,7 @@ with open(input_file) as inputfile:
                 id = 'id'
             else:
                 if id_prefix in ['merged']:
-                    id = title_string.replace(' ', '_')
+                    id = title_string.replace(' ', '_').replace('.','_')
                 else:
                     id = id_prefix + id_year + str(row_count)
             if has_id:

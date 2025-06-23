@@ -2,19 +2,21 @@
 
 export LC_ALL=C
 
-awk -F$'\t' '{print $19,$16,$9,$3,$6,$4,$1,$12,$5,$2,$15,$7,$8,$10,$11,$13,$14,$17,$18}' OFS=$'\t' ../tap-solr-data/TAP86-photolog.txt > ../tap-solr-data/TAP86_photolog.csv
-cut -f1,2,5,6,7,8,10,11,12,13,14,15,16,20,21 ../tap-solr-data/TAP90-photolog.txt > ../tap-solr-data/TAP90_photolog.csv
-awk -F$'\t' '{print $12,$11,$7,92,$4,$3,$10,$9,$1,$14,"",$5,$6,$2}' OFS=$'\t' ../tap-solr-data/TAP92-photolog.txt | perl -pe 's/\r//g' >  ../tap-solr-data/TAP92_photolog.csv
-cut -f1,2,5,6,7,8,10,12,13,14,15 ../tap-solr-data/TAP94-photolog.txt > ../tap-solr-data/TAP94_photolog.csv
+perl -pe 's/__//g;s/_\t/\t/g' ../tap-solr-data/TAP86-photolog.txt | cut -f1-19 | perl -pe 'print "86\t"' > ../tap-solr-data/TAP86_photolog.csv
+cut -f1,2,5-8,10-16,20,21 ../tap-solr-data/TAP90-photolog.txt | perl -pe 'print "90\t"' > ../tap-solr-data/TAP90_photolog.csv
+cut -f1-12,14 ../tap-solr-data/TAP92-photolog.txt | perl -pe 's/\r/ /g' | perl -pe 'print "92\t"' >  ../tap-solr-data/TAP92_photolog.csv
+cut -f1-17 ../tap-solr-data/TAP94-photolog.txt | perl -pe 'print "94\t"' > ../tap-solr-data/TAP94_photolog.csv
 # small repair to NML 94 photolog data
-perl -i -pe 's/\ttap\t/\tNML\t/' ../tap-solr-data/TAP94_photolog.csv
+perl -i -pe 's/\ttap\t/\tNML\t/;s/REVISION_D\tDATE/REVISION_D\tDATE2/;' ../tap-solr-data/TAP94_photolog.csv
+
+perl -i -pe 'if (/ROLL/ && /EXP/) {s/^\d+/SEASON/;s/_//g;}' ../tap-solr-data/TAP*_photolog.csv
 
 # tidy up some stray characters, insert DYPTE, etc.
 #perl -i -pe 's/\xf1//;s/\xcd//g;s/\x0b//g;s/\xca/ /g;s/\r//g;s/\.0+\t/\t/g;' ../tap-solr-data/TAP*_photolog.csv
 # perl -i -p fix.pl ../tap-solr-data/TAP*_photolog.csv
-perl -i -pe 's/\t0\.0+\t/\t0\t/g;s/\.0+\t/\t/g;s/\r//g;s/\xe6/ /g;s/\xca/ /g;s/\x0b//g;s/^/photologs\t/;s/(nml|nkh|npw)/uc($1)/e;' ../tap-solr-data/TAP*_photolog.csv
+perl -i -pe 's/"//g;s/\t0\.0+\t/\t0\t/g;s/\.0+\t/\t/g;s/\r//g;s/\xe6/ /g;s/\xca/ /g;s/\x0b//g;s/^/photologs\t/;s/(nml|nkh|npw)/uc($1)/e;' ../tap-solr-data/TAP*_photolog.csv
 # fix up header
-perl -i -pe 'if (/^photologs\tT_/) {s/_//g;s/\t/_s\t/g;s/$/_s/;s/photologs/DTYPE/;s/92/YEAR/;s/\t\t/\tREVISION_D_s\t/;}' ../tap-solr-data/TAP*_photolog.csv
+perl -i -pe 'if (/ROLL/ && /EXP/) {s/_//g;s/\t/_s\t/g;s/$/_s/;s/photologs/DTYPE/;}' ../tap-solr-data/TAP*_photolog.csv
 
 iconv -f utf-8 -t utf-8 -c ../tap-solr-data/TAP86_photolog.csv > tmp; mv tmp ../tap-solr-data/TAP86_photolog.csv
 iconv -f utf-8 -t utf-8 -c ../tap-solr-data/TAP90_photolog.csv > tmp; mv tmp ../tap-solr-data/TAP90_photolog.csv
