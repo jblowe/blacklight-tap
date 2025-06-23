@@ -114,19 +114,21 @@ class CatalogController < ApplicationController
     config.autocomplete_enabled = false
     config.autocomplete_path = 'suggest'
 
-    # config.view.gallery.partials = [:gallery]
+    # config.view.gallery.partials = ['catalog/gallery']
     # config.view.gallery.document_component = GalleryDocumentComponent
     # config.view.gallery.add_gallery_field 'KEY_s', label: 'Title'
-
+    # config.view.gallery.add_gallery_field 'DTYPE_s', label: 'dtype'
+    # config.view.gallery.add_gallery_field 'IMAGES_ss', label: 'Image', type: :image
 
     # FACET FIELDS
-     # config.add_facet_field 'DTYPE_s', label: 'Record type', limit: true
+     config.add_facet_field 'DTYPE_s', label: 'Record type', limit: true
      config.add_facet_field 'DTYPES_ONLY_ss', label: 'Record types', limit: true
      config.add_facet_field 'T_s', label: 'T#', limit: true
      config.add_facet_field 'KEY_s', label: 'KEY', limit: true
      # config.add_facet_field 'T_i', label: 'T numeric', limit: true
      config.add_facet_field 'SITE_s', label: 'SITE', limit: true
      config.add_facet_field 'YEAR_s', label: 'YEAR', limit: true
+     config.add_facet_field 'SEASON_s', label: 'SEASON', limit: true
      config.add_facet_field 'ROLL_s', label: 'ROLL', limit: true
      config.add_facet_field 'EXP_s', label: 'EXP', limit: true
      config.add_facet_field 'NOTES_s', label: 'NOTES', limit: true
@@ -156,6 +158,7 @@ class CatalogController < ApplicationController
      # config.add_index_field 'TITLE_s', label: 'TITLE'
      config.add_index_field 'SITE_s', label: 'SITE'
      config.add_index_field 'YEAR_s', label: 'YEAR'
+     config.add_index_field 'SEASON_s', label: 'SEASON'
      config.add_index_field 'ROLL_s', label: 'ROLL'
      config.add_index_field 'EXP_s', label: 'EXP'
      config.add_index_field 'OP_s', label: 'OP'
@@ -195,6 +198,7 @@ class CatalogController < ApplicationController
      # config.add_show_field 'T_i', label: 'T (numeric)'
      config.add_show_field 'SITE_s', label: 'SITE'
      config.add_show_field 'YEAR_s', label: 'YEAR'
+     config.add_show_field 'SEASON_s', label: 'SEASON'
      config.add_show_field 'ROLL_s', label: 'ROLL'
      config.add_show_field 'EXP_s', label: 'EXP'
      config.add_show_field 'OP_s', label: 'OP'

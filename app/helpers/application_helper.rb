@@ -33,7 +33,7 @@ module ApplicationHelper
           content_tag(:img, '', src: imagename, class: 'card-img-top')
         end
         card_body = content_tag(:div, class: 'card-body') do
-          content_tag(:p, imagename.gsub(/\/images\/.*?\//,'').gsub('.thumb.jpg',''), class: 'card-text')
+          content_tag(:p, imagename.gsub('/images/','').gsub('.thumb.jpg',''), class: 'card-text')
         end
         image_tag + card_body
       end
