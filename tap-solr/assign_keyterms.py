@@ -103,7 +103,7 @@ with open(input_file) as inputfile:
                 id = 'id'
             else:
                 if id_prefix in ['merged']:
-                    id = title_string.replace(' ', '_').replace('.','_')
+                    id = re.sub(r'[_\W]+','_',title_string)
                 else:
                     id = id_prefix + id_year + str(row_count)
             if has_id:

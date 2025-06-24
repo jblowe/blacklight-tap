@@ -42,7 +42,7 @@ def parse_image_filename(filepath):
     imagename = re.sub(r'^Tap[_\- ]?', 'Sea', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'(.*)\..+?$', r'\1', imagename, flags=re.IGNORECASE)  # get rid of extension
 
-    imagename = re.sub(r'T#(\d+)', r'T\1', imagename, flags=re.IGNORECASE)  # normalized T numbers
+    imagename = re.sub(r'T# ?(\d+)', r'T\1', imagename, flags=re.IGNORECASE)  # normalized T numbers
     imagename = re.sub(r'(Ro?l?l?|Op|Sq|Area|T|Lot|Fe?a?t?|Reg?)[_ ]*', r'\1', imagename, flags=re.IGNORECASE)
     # e.g. PL_R13_32.tif
     imagename = re.sub(r'([RL])(\d+)_(\d+)', r'\1\2_#\3', imagename, flags=re.IGNORECASE)
@@ -52,6 +52,7 @@ def parse_image_filename(filepath):
     imagename = re.sub(r'w(\d+)', r' W\1', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'(\d+)[#_](\d+)', r'\1_#\2', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bB ([\w, ]+)\b', r'B\1', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r'\bBurial ([\w, ]+)\b', r'B\1', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bOp (\w+)\b', r'Op\1', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bR#+', 'R#', imagename, flags=re.IGNORECASE)
     # NKH1 069, etc.
@@ -64,6 +65,9 @@ def parse_image_filename(filepath):
 
 def extract_fields(imagename, filepath):
     (site, season, tno, roll, exp, op, sq, area, lot, fea, reg, bur, etc, direction, profile, mxp) = [''] * 16
+
+    if 'T# 15141 TAP 92 Op1 Burial 2' in filepath:
+        pass
 
     if 'Isotope Project 2023' in filepath:
         # e.g. 20230214_145319.jpg, just extract date portion
@@ -105,9 +109,6 @@ def extract_fields(imagename, filepath):
             (roll, exp, bur) = [''] * 3
 
         if 'Op B - B 3, 4.pdf' in filepath:
-            #print(filepath)
-            pass
-        if '13.1' in roll:
             #print(filepath)
             pass
 

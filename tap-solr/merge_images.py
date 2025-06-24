@@ -2,6 +2,7 @@ import solr
 import sys
 from collections import defaultdict
 import csv
+import re
 
 core = 'tap'
 query = 'DTYPE_s:"{}"'
@@ -148,14 +149,18 @@ for i, dtype in enumerate(DTYPES):
             except:
                 EXP = 'EEE'
             if DIRECTION != 'DDD' or SKETCH != 'KKK':
-                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {DIRECTION} {SKETCH}"
+                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {DIRECTION} {SKETCH}".replace('  ',' ').replace('  ',' ')
                 KEY_TYPES[dtype + ' OP DDD KKK'] += 1
             elif ROLL != 'RRR' and EXP != 'EEE':
-                key_photo = f"{SEASON} {ROLL.zfill(3)} {EXP.zfill(3)}"
-                KEY_TYPES[dtype + ' SS R E'] += 1
+                if SEASON =='92':
+                    key_photo = f"{SITE} {SEASON} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                    KEY_TYPES[dtype + ' SSS SS R E'] += 1
+                else:
+                    key_photo = f"{SITE} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                    KEY_TYPES[dtype + ' SS R E'] += 1
                 # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
             elif (OP + SQ + BU) != '':
-                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {BU}".replace('  ',' ').replace('  ',' ')
+                key_photo = f"{SITE.ljust(3)} {SEASON} {OP} {SQ} {BU}".replace('  ',' ').replace('  ',' ')
                 KEY_TYPES[dtype + ' SSS YY OP/SQ BU'] += 1
             elif ROLL != 'RRR' or EXP != 'EEE':
                 key_photo = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
@@ -164,7 +169,7 @@ for i, dtype in enumerate(DTYPES):
                 key_seq = ''
                 KEY_TYPES[dtype + ' SEQ'] += 1
 
-        if key_photo == 'SS 010 010':
+        if 'T# 15141 TAP 92 Op1 Burial 2' in hit.get('FILENAME_s',''):
             pass
 
         record_list.append([key_tno, key_photo, key_seq, dtype, hit])
@@ -226,7 +231,7 @@ with open(output_file, 'w') as outputfile:
         if key == 'SS 010 010':
             pass
 
-        output_record = [key.replace(' ','_'), key, 'merged records', title,
+        output_record = [re.sub(r'[_\W]+','_',title), key, 'merged records', title,
                          format_dtypes(merged_records['DTYPES_ss']),
                          format_dtypes_only(merged_records['DTYPES_ss']),
                          '|'.join(subrecord),
