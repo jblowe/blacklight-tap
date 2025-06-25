@@ -134,6 +134,7 @@ for i, dtype in enumerate(DTYPES):
         DIRECTION = hit.get('DIRECTION_s', 'DDD')
         SKETCH = hit.get('SKETCH_s', 'KKK')
         FILEPATH = hit.get('FILEPATH_s', 'not a file')
+        FILENAME = hit.get('FILENAME_s', 'not a file')
         OP = hit.get('OP_s', '')
         SQ = hit.get('SQ_s', '')
         BU = hit.get('BURIAL_s', '')
@@ -148,8 +149,14 @@ for i, dtype in enumerate(DTYPES):
                 check = int(EXP)
             except:
                 EXP = 'EEE'
-            if DIRECTION != 'DDD' or SKETCH != 'KKK':
-                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {DIRECTION} {SKETCH}".replace('  ',' ').replace('  ',' ')
+
+            # don't let the polaroids merge with anything else
+            if dtype == 'polaroids':
+                slug = re.sub(r'(.*)\..+?$', r'\1', FILENAME)
+                key_photo = f"{slug}"
+                KEY_TYPES[dtype + ' filename'] += 1
+            elif DIRECTION != 'DDD' or SKETCH != 'KKK':
+                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {DIRECTION} {SKETCH}".replace('  ',' ').replace('  ',' ')
                 KEY_TYPES[dtype + ' OP DDD KKK'] += 1
             elif ROLL != 'RRR' and EXP != 'EEE':
                 if SEASON =='92':

@@ -35,13 +35,13 @@ def parse_image_filename(filepath):
     # imagename = re.sub(r'NKH (\d+) Ro(\d+)\-(\d+)', r'NKH \1 R\2 #\3', imagename, flags=re.IGNORECASE)
     # Obj# 22
     # R##566D5
-    imagename = re.sub(r', ', r',', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r', +', r',', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'tif\.tif', r'.tif', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'R##*([\d\w]+)', r'Reg\1', imagename, flags=re.IGNORECASE)
 
     imagename = re.sub(r'^Tap[_\- ]?', 'Sea', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'(.*)\..+?$', r'\1', imagename, flags=re.IGNORECASE)  # get rid of extension
-
+    imagename = re.sub(r'NPW ([A-Z] )', r'NPW Sq \1 ', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'T# ?(\d+)', r'T\1', imagename, flags=re.IGNORECASE)  # normalized T numbers
     imagename = re.sub(r'(Ro?l?l?|Op|Sq|Area|T|Lot|Fe?a?t?|Reg?)[_ ]*', r'\1', imagename, flags=re.IGNORECASE)
     # e.g. PL_R13_32.tif
@@ -68,7 +68,9 @@ def extract_fields(imagename, filepath):
 
     if 'T# 15141 TAP 92 Op1 Burial 2' in filepath:
         pass
-
+    if 'NPW M Balk Section South.ai' in filepath:
+        pass
+    #
     if 'Isotope Project 2023' in filepath:
         # e.g. 20230214_145319.jpg, just extract date portion
         try:
