@@ -31,7 +31,7 @@ python3 assign_keyterms.py ../tap-solr-data/TAP94_photolog.csv tmp; mv tmp ../ta
 perl    -pe 's/\r//g;s/^/master\t/;' ../tap-solr-data/TAP_Master_Bag_Log_TAP_Data_Base.txt > ../tap-solr-data/TAP_master.csv
 perl -i -pe 'if (/^master\tTnumber/) {s/Tnumber/T/;s/Season/YEAR/;s/^master/DTYPE/;tr/a-z/A-Z/;s/\t/_s\t/g;s/$/_s/;}' ../tap-solr-data/TAP_master.csv
 # fix date: 199x -> 9x
-perl -i -ne '$i++;@x=split(/\t/,$_,-1);if ($i != 1){$x[4]=int($x[4])-1900};print join("\t",@x);' ../tap-solr-data/TAP_master.csv
+perl -i -ne '$i++;@x=split(/\t/,$_,-1);if ($i != 1 && $x[4]>0){$x[4]=int($x[4])-1900};print join("\t",@x);' ../tap-solr-data/TAP_master.csv
 iconv -f utf-8 -t utf-8 -c ../tap-solr-data/TAP_master.csv > tmp; mv tmp ../tap-solr-data/TAP_master.csv
 
 python3 assign_keyterms.py ../tap-solr-data/TAP_master.csv tmp; mv tmp ../tap-solr-data/TAP_master.csv

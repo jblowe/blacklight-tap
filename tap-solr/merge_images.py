@@ -8,12 +8,13 @@ core = 'tap'
 query = 'DTYPE_s:"{}"'
 total_records = 0
 output_file = sys.argv[1]
+merged_file = sys.argv[2]
 rows = 100000
 delim = '\t'
 
 # nb: DTYPE_s is handled specially further down; THUMBNAIL and FILENAME eliminated -- redundant
 OUTPUT_FIELDS = 'T_s SITE_s YEAR_s OP_s SQ_s LOT_s ROLL_s EXP_s AREA_s TRAY_s LEVEL_s MATERIAL_s NOTES_s STRATUM_s CLASS_s ' + \
-                'IMAGENAME_s BURIAL_s COUNT_s DIRECTORY_s DTYPES_ONLY_ss DTYPES_ss DOC_ss ' + \
+                'IMAGENAME_s FILENAME_s BURIAL_s COUNT_s DIRECTORY_s DTYPES_ONLY_ss DTYPES_ss DOC_ss ' + \
                 'ENTRY_DATE_s ETC_s EXCAVATIONDATE_s EXCAVATOR_s FEATURE__s FEA_s ' + \
                 'FILENAMES_ss IMAGES_ss KEYTERMS_ss ' + \
                 'RECORDS_ss REGISTRAR_s REG_s SEASON_s ' + \
@@ -24,12 +25,12 @@ KEY_TYPES = defaultdict(int)
 record_list = []
 keys = defaultdict(list)
 DTYPE_COUNTS = defaultdict(int)
-DTYPES = 'master polaroids tray images photologs bags box'.split(' ')
+DTYPES = 'master bags polaroids inventory images photologs box'.split(' ')
 # DTYPES = 'photologs images polaroids box'.split(' ')
 SEASONS = {'86': 'NPW', '90': 'NKH', '92': 'NKH', '94': 'NML'}
 DIST = defaultdict(defaultdict)
-YEARS = '86 90 92 93 94 YY'.split(' ')
-LOCATIONS = 'NPW|NKH|NML|PL|KTK|BKPK|SSS'.split('|')
+YEARS = '85 86 90 92 93 94 YY'.split(' ')
+LOCATIONS = 'HY|NPW|NKH|NKW|NML|PL|KTK|BKPK|SSS'.split('|')
 for s in YEARS:
     for l in LOCATIONS:
         DIST[s][l] = 0
@@ -81,7 +82,10 @@ def fix_hit(hit):
 def compute_pattern(filename):
     pass
 
+
 errors = defaultdict(int)
+
+
 def write_errors(message, flds):
     csverrors.writerow([message] + flds)
     errors[message] += 1
@@ -91,6 +95,10 @@ errorfile = open('merge_errors.csv', 'w')
 csverrors = csv.writer(errorfile, delimiter=delim, quoting=csv.QUOTE_MINIMAL)
 # create a connection to a solr server
 s = solr.SolrConnection(f'http://localhost:8983/solr/{core}')
+
+mergefile = open(merged_file, 'w')
+csvmerge = csv.writer(mergefile, delimiter=delim, quoting=csv.QUOTE_MINIMAL)
+csvmerge.writerow('key_tno key_photo key_seq dtype'.split(' ') + [o for o in OUTPUT_FIELDS if '_ss' not in o])
 
 for i, dtype in enumerate(DTYPES):
     filled_in_query = query.format(dtype)
@@ -111,7 +119,7 @@ for i, dtype in enumerate(DTYPES):
             if '_s' in r:
                 FIELDS[r] += 1
         if 'Site_s' in hit and hit['SITE_s'] == 'isotope':
-            record_list.append(['',f'isotope {hit["ETC_s"]}','', 'isotope', hit])
+            record_list.append(['', f'isotope {hit["ETC_s"]}', '', 'isotope', hit])
             KEY_TYPES['isotope date'] += 1
             continue
         if 'T_s' in hit:
@@ -126,8 +134,9 @@ for i, dtype in enumerate(DTYPES):
                     key_tno = hit['T_s']
             else:
                 key_tno = ''
-        SEASON = hit.get('SEASON_s', 'SS')
-        YEAR = hit.get('YEAR_s', 'YY')
+
+        SEASON = hit.get('SEASON_s', 'YY')
+        YEAR = hit.get('YEAR_s', SEASON)
         ROLL = hit.get('ROLL_s', 'RRR')
         EXP = hit.get('EXP_s', 'EEE')
         SITE = hit.get('SITE_s', 'SSS')
@@ -138,8 +147,10 @@ for i, dtype in enumerate(DTYPES):
         OP = hit.get('OP_s', '')
         SQ = hit.get('SQ_s', '')
         BU = hit.get('BURIAL_s', '')
+        if YEAR != SEASON:
+            pass
         if key_tno == '':
-            if SITE not in 'NPW|NKH|NML|PL|KTK'.split('|'):
+            if SITE not in 'HY|NPW|NKH|NKW|NML|PL|KTK'.split('|'):
                 try:
                     SITE = SEASONS[YEAR]
                 except:
@@ -154,34 +165,46 @@ for i, dtype in enumerate(DTYPES):
             if dtype == 'polaroids':
                 slug = re.sub(r'(.*)\..+?$', r'\1', FILENAME)
                 key_photo = f"{slug}"
-                KEY_TYPES[dtype + ' filename'] += 1
+                KEY_TYPES[dtype + ' by filename'] += 1
             elif DIRECTION != 'DDD' or SKETCH != 'KKK':
-                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {DIRECTION} {SKETCH}".replace('  ',' ').replace('  ',' ')
+                if SKETCH == 'KKK':
+                    SKETCH = '<unknown>'
+                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {DIRECTION} {SKETCH}".replace('  ', ' ').replace('  ',                                                                                            ' ')
                 KEY_TYPES[dtype + ' OP DDD KKK'] += 1
             elif ROLL != 'RRR' and EXP != 'EEE':
-                if SEASON =='92':
-                    key_photo = f"{SITE} {SEASON} {ROLL.zfill(3)} {EXP.zfill(3)}"
-                    KEY_TYPES[dtype + ' SSS SS R E'] += 1
+                if SEASON == '92':
+                    key_photo = f"{SITE} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                    KEY_TYPES[dtype + ' SSS YY R E'] += 1
                 else:
                     key_photo = f"{SITE} {ROLL.zfill(3)} {EXP.zfill(3)}"
-                    KEY_TYPES[dtype + ' SS R E'] += 1
+                    KEY_TYPES[dtype + ' SSS R E'] += 1
                 # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
             elif (OP + SQ + BU) != '':
-                key_photo = f"{SITE.ljust(3)} {SEASON} {OP} {SQ} {BU}".replace('  ',' ').replace('  ',' ')
+                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {BU}".replace('  ', ' ').replace('  ', ' ')
                 KEY_TYPES[dtype + ' SSS YY OP/SQ BU'] += 1
             elif ROLL != 'RRR' or EXP != 'EEE':
                 key_photo = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
                 KEY_TYPES[dtype + ' SSS YY R E'] += 1
             else:
-                key_seq = ''
                 KEY_TYPES[dtype + ' SEQ'] += 1
 
-        if 'T# 15141 TAP 92 Op1 Burial 2' in hit.get('FILENAME_s',''):
+            # zap sequence number key if one of the others exists
+            if key_tno != '' or key_photo != '':
+                key_seq = ''
+
+        if 'T# 15141 TAP 92 Op1 Burial 2' in hit.get('FILENAME_s', ''):
             pass
 
+
+        if 'TAP 92 NKH1 004' in key_photo:
+            pass
+
+        csvmerge.writerow([key_tno, key_photo, key_seq, dtype] +
+                          [hit.get(h,'') for h in OUTPUT_FIELDS if '_ss' not in h])
         record_list.append([key_tno, key_photo, key_seq, dtype, hit])
         if [key_tno, key_photo, key_seq] == [''] * 3:
-            write_errors('empty keys', [hit[h] for h in OUTPUT_FIELDS if '_s' in h and h in hit and 'KEYTERMS' not in h])
+            write_errors('empty keys',
+                         [hit[h] for h in OUTPUT_FIELDS if '_s' in h and h in hit and 'KEYTERMS' not in h])
         if (SITE == 'SSS' or YEAR == 'YY') and key_tno == '':
             write_errors(f'vague key', [dtype, key_tno, key_photo, key_seq, FILEPATH])
         if YEAR in YEARS and SITE in LOCATIONS:
@@ -191,7 +214,7 @@ for i, dtype in enumerate(DTYPES):
         if 'FILENAME_s' in hit and 'TAP 92 NPW OP7 B1' in hit['FILENAME_s']:
             pass
 
-# consolidate records on keys
+# consolidate records on keys, in order
 for r in record_list:
     if r[0] != '':
         keys[r[0]].append(r)
@@ -200,7 +223,14 @@ for r in record_list:
     elif r[2] != '':
         keys[r[2]].append(r)
     else:
-        write_errors('no key generated', [r[4][h] for h in OUTPUT_FIELDS if '_s' in h and h in r[4] and 'KEYTERMS' not in h])
+        write_errors('no key generated',
+                     [r[4][h] for h in OUTPUT_FIELDS if '_s' in h and h in r[4] and 'KEYTERMS' not in h])
+
+# free up some memory
+del record_list
+
+if 'TAP 92 NKH1 004' not in keys:
+    pass
 
 with open(output_file, 'w') as outputfile:
     csvoutput = csv.writer(outputfile, delimiter=delim, quoting=csv.QUOTE_MINIMAL)
@@ -235,10 +265,10 @@ with open(output_file, 'w') as outputfile:
             write_errors('pathological merged record', [key, title, merged_records['DTYPES_ss']])
             continue
 
-        if key == 'SS 010 010':
+        if 'TAP 92 NKH1 004' in key:
             pass
 
-        output_record = [re.sub(r'[_\W]+','_',title), key, 'merged records', title,
+        output_record = [re.sub(r'[_\W]+', '_', key), key, 'merged records', title,
                          format_dtypes(merged_records['DTYPES_ss']),
                          format_dtypes_only(merged_records['DTYPES_ss']),
                          '|'.join(subrecord),

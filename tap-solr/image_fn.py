@@ -35,13 +35,20 @@ def parse_image_filename(filepath):
     # imagename = re.sub(r'NKH (\d+) Ro(\d+)\-(\d+)', r'NKH \1 R\2 #\3', imagename, flags=re.IGNORECASE)
     # Obj# 22
     # R##566D5
+
+    if 'TAP 92 NPW1 001' in filepath:
+        pass
+
     imagename = re.sub(r', +', r',', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'tif\.tif', r'.tif', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'R##*([\d\w]+)', r'Reg\1', imagename, flags=re.IGNORECASE)
 
     imagename = re.sub(r'^Tap[_\- ]?', 'Sea', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r' *(east|west|north|south) *', r' \1 ', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r' *(and) *', ' and ', imagename, flags=re.IGNORECASE)
+
     imagename = re.sub(r'(.*)\..+?$', r'\1', imagename, flags=re.IGNORECASE)  # get rid of extension
-    imagename = re.sub(r'NPW ([A-Z] )', r'NPW Sq \1 ', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r'NPW ([A-Z]) ', r'NPW Sq \1 ', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'T# ?(\d+)', r'T\1', imagename, flags=re.IGNORECASE)  # normalized T numbers
     imagename = re.sub(r'(Ro?l?l?|Op|Sq|Area|T|Lot|Fe?a?t?|Reg?)[_ ]*', r'\1', imagename, flags=re.IGNORECASE)
     # e.g. PL_R13_32.tif
@@ -49,7 +56,7 @@ def parse_image_filename(filepath):
     # e.g. NKH_92_Ro_534.thumb.jpg
     imagename = re.sub(r'(Ro)[_ ]?(\d+)\-(\d+)', r'R\2_#\3', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'(Ro)[_ ]?(\d+)', r'R\2', imagename, flags=re.IGNORECASE)
-    imagename = re.sub(r'w(\d+)', r' W\1', imagename, flags=re.IGNORECASE)
+    imagename = re.sub(r'w(\d+)', r' W\1', imagename)
     imagename = re.sub(r'(\d+)[#_](\d+)', r'\1_#\2', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bB ([\w, ]+)\b', r'B\1', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'\bBurial ([\w, ]+)\b', r'B\1', imagename, flags=re.IGNORECASE)
@@ -69,6 +76,8 @@ def extract_fields(imagename, filepath):
     if 'T# 15141 TAP 92 Op1 Burial 2' in filepath:
         pass
     if 'NPW M Balk Section South.ai' in filepath:
+        pass
+    if 'TAP 92 NPW1 001' in filepath:
         pass
     #
     if 'Isotope Project 2023' in filepath:
@@ -97,7 +106,7 @@ def extract_fields(imagename, filepath):
             lot = match(r'Lot(\d+)', part, flags=re.IGNORECASE) if lot == '' else lot
             fea = match(r'\bFe?a?t?(\d+)', part, flags=re.IGNORECASE) if fea == '' else fea
             reg = match(r'\bRe?g?#([\d\w]+)', part, flags=0) if reg == '' else reg
-            site = match(r'(NPW|NKH|NML|NKW|PL|KTK)', part, flags=re.IGNORECASE) if site == '' else site
+            site = match(r'(NPW|NKH|NML|NKW|PL|KTK)', part, flags=0) if site == '' else site
             tno = match(r'^T#?([\d]+[A-Z]*)', part, flags=re.IGNORECASE) if tno == '' else tno
             bur = match(r'^Burial[# ]*([\d, \-]+)', part, flags=re.IGNORECASE) if bur == '' else bur
             bur = match(r'^\bBu?r?i?a?l?[# ]*([\d, \-]+)', part, flags=re.IGNORECASE) if bur == '' else bur
@@ -110,17 +119,13 @@ def extract_fields(imagename, filepath):
         if 'IMG_' in imagename:
             (roll, exp, bur) = [''] * 3
 
-        if 'Op B - B 3, 4.pdf' in filepath:
-            #print(filepath)
-            pass
-
         if '47A' in roll:
             roll = '47'
         if '47B' in roll:
             roll = '47.2'
 
 
-        if '13.1' in roll:
+        if '86-9 Sq A Plan' in filepath:
             #print(filepath)
             pass
 

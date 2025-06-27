@@ -124,26 +124,27 @@ class CatalogController < ApplicationController
      config.add_facet_field 'DTYPE_s', label: 'Record type', limit: true
      config.add_facet_field 'DTYPES_ONLY_ss', label: 'Record types', limit: true
      config.add_facet_field 'T_s', label: 'T#', limit: true
-     config.add_facet_field 'KEY_s', label: 'KEY', limit: true
+     config.add_facet_field 'KEY_s', label: 'Merge key', limit: true
      # config.add_facet_field 'T_i', label: 'T numeric', limit: true
-     config.add_facet_field 'SITE_s', label: 'SITE', limit: true
-     config.add_facet_field 'YEAR_s', label: 'YEAR', limit: true
-     config.add_facet_field 'SEASON_s', label: 'SEASON', limit: true
-     config.add_facet_field 'ROLL_s', label: 'ROLL', limit: true
-     config.add_facet_field 'EXP_s', label: 'EXP', limit: true
-     config.add_facet_field 'NOTES_s', label: 'NOTES', limit: true
-     config.add_facet_field 'MATERIAL_s', label: 'MATERIAL', limit: true
+     config.add_facet_field 'SITE_s', label: 'Site', limit: true
+     config.add_facet_field 'YEAR_s', label: 'Year', limit: true
+     config.add_facet_field 'SEASON_s', label: 'Season', limit: true
+     config.add_facet_field 'ROLL_s', label: 'Roll', limit: true
+     config.add_facet_field 'EXP_s', label: 'Exposure', limit: true
+     config.add_facet_field 'NOTES_s', label: 'Notes', limit: true
+     config.add_facet_field 'MATERIAL_s', label: 'Material', limit: true
      config.add_facet_field 'CLASS_s', label: 'CLASS', limit: true
-     config.add_facet_field 'OP_s', label: 'OP', limit: true
-     config.add_facet_field 'AREA_s', label: 'AREA', limit: true
-     config.add_facet_field 'LEVEL_s', label: 'LEVEL', limit: true
-     config.add_facet_field 'LOT_s', label: 'LOT', limit: true
+     config.add_facet_field 'OP_s', label: 'Op', limit: true
+     config.add_facet_field 'SQ_s', label: 'Square', limit: true
+     config.add_facet_field 'AREA_s', label: 'Area', limit: true
+     config.add_facet_field 'LEVEL_s', label: 'Level', limit: true
+     config.add_facet_field 'LOT_s', label: 'Lot', limit: true
      config.add_facet_field 'BURIAL_s', label: 'BURIAL', limit: true
-     config.add_facet_field 'DATE_s', label: 'DATE', limit: true
+     config.add_facet_field 'DATE_s', label: 'Date', limit: true
      config.add_facet_field 'REVISIOND_s', label: 'REVISIOND', limit: true
      config.add_facet_field 'DUPLICATED_s', label: 'DUPLICATED', limit: true
      config.add_facet_field 'EXCAVATOR_s', label: 'EXCAVATOR', limit: true
-     config.add_facet_field 'FEA_s', label: 'FEA', limit: true
+     config.add_facet_field 'FEA_s', label: 'Feature', limit: true
      config.add_facet_field 'NOTES2_s', label: 'NOTES2', limit: true
      config.add_facet_field 'DOC_ss', label: 'Doc type', limit: true
      config.add_facet_field 'OBJ_s', label: 'OBJ', limit: true
@@ -153,27 +154,27 @@ class CatalogController < ApplicationController
 
     # INDEX DISPLAY
      config.add_index_field 'T_s', label: 'T#'
-     config.add_index_field 'KEY_s', label: 'KEY'
+     config.add_index_field 'KEY_s', label: 'Merge key'
      # config.add_index_field 'T_i', label: 'T (numeric)'
      # config.add_index_field 'TITLE_s', label: 'TITLE'
-     config.add_index_field 'SITE_s', label: 'SITE'
-     config.add_index_field 'YEAR_s', label: 'YEAR'
-     config.add_index_field 'SEASON_s', label: 'SEASON'
-     config.add_index_field 'ROLL_s', label: 'ROLL'
-     config.add_index_field 'EXP_s', label: 'EXP'
-     config.add_index_field 'OP_s', label: 'OP'
-     config.add_index_field 'SQ_s', label: 'SQ'
-     config.add_index_field 'LEVEL_s', label: 'LEVEL'
-     config.add_index_field 'AREA_s', label: 'AREA'
-     config.add_index_field 'LOT_s', label: 'LOT'
-     config.add_index_field 'FEA_s', label: 'FEA'
-     config.add_index_field 'OBJ_s', label: 'OBJ'
-     config.add_index_field 'BURIAL_s', label: 'BURIAL'
-     config.add_index_field 'NOTES_s', label: 'NOTES'
+     config.add_index_field 'SITE_s', label: 'Site'
+     config.add_index_field 'YEAR_s', label: 'Year'
+     config.add_index_field 'SEASON_s', label: 'Season'
+     config.add_index_field 'ROLL_s', label: 'Roll'
+     config.add_index_field 'EXP_s', label: 'Exposure'
+     config.add_index_field 'OP_s', label: 'Op'
+     config.add_index_field 'SQ_s', label: 'Square'
+     config.add_index_field 'LEVEL_s', label: 'Level'
+     config.add_index_field 'AREA_s', label: 'Area'
+     config.add_index_field 'LOT_s', label: 'Lot'
+     config.add_index_field 'FEA_s', label: 'Feature'
+     config.add_index_field 'OBJECT_s', label: 'Object'
+     config.add_index_field 'BURIAL_s', label: 'Burial'
+     config.add_index_field 'NOTES_s', label: 'Notes'
      config.add_index_field 'NOTES2_s', label: 'NOTES2'
-     config.add_index_field 'MATERIAL_s', label: 'MATERIAL'
-     config.add_index_field 'DATE_s', label: 'DATE'
-     config.add_index_field 'TRAY_s', label: 'TRAY'
+     config.add_index_field 'MATERIAL_s', label: 'Material'
+     config.add_index_field 'DATE_s', label: 'Date'
+     config.add_index_field 'TRAY_s', label: 'Tray'
      config.add_index_field 'DOC_ss', label: 'Doc type'
 
      config.add_index_field 'REVISIOND_s', label: 'REVISIOND'
@@ -196,44 +197,43 @@ class CatalogController < ApplicationController
      config.add_show_field 'T_s', label: 'T#'
      config.add_show_field 'KEY_s', label: 'KEY'
      # config.add_show_field 'T_i', label: 'T (numeric)'
-     config.add_show_field 'SITE_s', label: 'SITE'
-     config.add_show_field 'YEAR_s', label: 'YEAR'
-     config.add_show_field 'SEASON_s', label: 'SEASON'
-     config.add_show_field 'ROLL_s', label: 'ROLL'
-     config.add_show_field 'EXP_s', label: 'EXP'
-     config.add_show_field 'OP_s', label: 'OP'
-     config.add_show_field 'SQ_s', label: 'SQ'
-     config.add_show_field 'LOT_s', label: 'LOT'
-     config.add_show_field 'AREA_s', label: 'AREA'
-     config.add_show_field 'LEVEL_s', label: 'LEVEL'
-     config.add_show_field 'DATE_s', label: 'DATE'
-     config.add_show_field 'REVISIOND_s', label: 'REVISIOND'
-     config.add_show_field 'NOTES_s', label: 'NOTES'
+     config.add_show_field 'SITE_s', label: 'Site'
+     config.add_show_field 'YEAR_s', label: 'Year'
+     config.add_show_field 'SEASON_s', label: 'Season'
+     config.add_show_field 'ROLL_s', label: 'Roll'
+     config.add_show_field 'EXP_s', label: 'Exposure'
+     config.add_show_field 'OP_s', label: 'Op'
+     config.add_show_field 'SQ_s', label: 'Square'
+     config.add_show_field 'LOT_s', label: 'Lot'
+     config.add_show_field 'AREA_s', label: 'Area'
+     config.add_show_field 'LEVEL_s', label: 'Level'
+     config.add_show_field 'DATE_s', label: 'Date'
+     config.add_show_field 'REVISIONDATE_s', label: 'Revision date'
+     config.add_show_field 'NOTES_s', label: 'Notes'
      config.add_show_field 'DUPLICATED_s', label: 'DUPLICATED'
-     config.add_show_field 'EXCAVATOR_s', label: 'EXCAVATOR'
-     config.add_show_field 'FEA_s', label: 'FEA'
-     config.add_show_field 'FEATURE__s', label: 'FEATURE_'
+     config.add_show_field 'EXCAVATOR_s', label: 'Exavator'
+     config.add_show_field 'FEATUR_s', label: 'Feature'
      config.add_show_field 'NOTES2_s', label: 'NOTES2'
-     config.add_show_field 'OBJ_s', label: 'OBJ'
-     config.add_show_field 'WEIGHT_s', label: 'WEIGHT'
-     config.add_show_field 'PHOTOTYPE_s', label: 'PHOTOTYPE'
-     config.add_show_field 'REG_s', label: 'REG'
+     config.add_show_field 'OBJECT_s', label: 'Object #'
+     config.add_show_field 'WEIGHT_s', label: 'Weight'
+     config.add_show_field 'PHOTOTYPE_s', label: 'Photo type'
+     config.add_show_field 'REG_s', label: 'Reg number'
      config.add_show_field 'DTYPE_s', label: 'DTYPE'
      config.add_show_field 'BURIAL_s', label: 'BURIAL'
      config.add_show_field 'CLASS_s', label: 'CLASS'
      config.add_show_field 'COUNT_s', label: 'COUNT'
-     config.add_show_field 'ENTRY_DATE_s', label: 'ENTRY_DATE'
-     config.add_show_field 'EXCAVATIONDATE_s', label: 'EXCAVATIONDATE'
-     config.add_show_field 'MATERIAL_s', label: 'MATERIAL'
-     config.add_show_field 'REGISTRAR_s', label: 'REGISTRAR'
+     config.add_show_field 'ENTRY_DATE_s', label: 'Entry date'
+     config.add_show_field 'EXCAVATIONDATE_s', label: 'Excavation date'
+     config.add_show_field 'MATERIAL_s', label: 'Material'
+     config.add_show_field 'REGISTRAR_s', label: 'Registrar'
      config.add_show_field 'UNKNOWN_s', label: 'UNKNOWN'
      config.add_show_field 'ETC_s', label: 'ETC'
-     config.add_show_field 'TRAY_s', label: 'TRAY'
+     config.add_show_field 'TRAY_s', label: 'UPM Tray'
      config.add_show_field 'DOC_ss', label: 'Doc type'
-     config.add_show_field 'FILENAME_s', label: 'FILEPATH'
-     config.add_show_field 'IMAGENAME_s', label: 'FILENAME'
-     config.add_show_field 'KEYTERMS_ss', label: 'KEYTERMS'
-     config.add_show_field 'RECORDS_ss', helper_method: 'render_records', label: 'RECORDS'
+     config.add_show_field 'FILENAME_s', label: 'Filename'
+     config.add_show_field 'IMAGENAME_s', label: 'Filename'
+     config.add_show_field 'KEYTERMS_ss', label: 'Keyterms'
+     config.add_show_field 'RECORDS_ss', helper_method: 'render_records', label: 'Merged records'
      config.add_show_field 'IMAGES_ss', helper_method: 'render_images', label: 'Images'
      config.add_show_field 'FILENAMES_ss', helper_method: 'render_filenames', label: 'Filenames'
 

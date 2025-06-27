@@ -16,7 +16,7 @@ delim = '\t'
 
 DOCS = 'SCHEMATIC SCANS SCAN PROFILES PROFILE REPORTS REPORT GRAPHS GRAPH SUMMARIES SUMMARY FORMS FORM NOTEBOOKS NOTEBOOK MAPS MAP SKETCHES SKETCH BURIAL BURIALS'.lower().split(' ')
 
-title_labels = 't,site,year,roll,exp,op,sq,area,lot,fea,reg,burial'.split(',')
+title_labels = 't,site,season,year,roll,exp,op,sq,area,lot,fea,reg,direction,sketch,burial'.split(',')
 extras = 'direction,profile,map,etc,material,class,notes,description,date'.split(',')
 
 def get_index(lst,fld):
@@ -30,11 +30,11 @@ def extract_title(row, header):
             n = header.index(label.upper()+'_s')
         except:
             continue
-        if label in 'site year t'.split(' '):
+        if label in 'site year season t'.split(' '):
             title = title + f'{row[n].upper()} '
         else:
             if row[n] != '':
-                title = title + f'{label.capitalize()[:2]}{row[n]} '
+                title = title + f'{label.capitalize()[:2]}{row[n].upper()} '
 
     for i, label in enumerate(extras):
         try:
@@ -43,11 +43,10 @@ def extract_title(row, header):
             continue
         if row[n] not in title:
             title = title + f'{row[n]} '
-    return title.replace('/','_').replace('#','_').strip()
+    return title.replace('/','_').replace('#','_').replace('__','_').strip()
 
 def extract_terms(val):
     possible_string = val.replace('/Users/johnlowe/Box Sync/TAP Collaborations/', '')
-    #possible_terms = re.split(r"[,\s;\/\._%\|\)\(\]\[]+", possible_string)
     possible_terms = re.split(r"[\W_]+", possible_string.lower())
     keyterms = set()
     document_types = set()
@@ -102,8 +101,10 @@ with open(input_file) as inputfile:
                 header = row
                 id = 'id'
             else:
+                # if we are processing the merged file, use its ids
                 if id_prefix in ['merged']:
-                    id = re.sub(r'[_\W]+','_',title_string)
+                    # id = re.sub(r'[_\W]+','_',title_string)
+                    id = row[0]
                 else:
                     id = id_prefix + id_year + str(row_count)
             if has_id:
