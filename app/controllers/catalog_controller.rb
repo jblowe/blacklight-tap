@@ -139,18 +139,18 @@ class CatalogController < ApplicationController
      config.add_facet_field 'AREA_s', label: 'Area', limit: true
      config.add_facet_field 'LEVEL_s', label: 'Level', limit: true
      config.add_facet_field 'LOT_s', label: 'Lot', limit: true
-     config.add_facet_field 'BURIAL_s', label: 'BURIAL', limit: true
+     config.add_facet_field 'BURIAL_s', label: 'Burial', limit: true
      config.add_facet_field 'DATE_s', label: 'Date', limit: true
-     config.add_facet_field 'REVISIOND_s', label: 'REVISIOND', limit: true
+     config.add_facet_field 'REVISIONDATE_s', label: 'Revision date', limit: true
      config.add_facet_field 'DUPLICATED_s', label: 'DUPLICATED', limit: true
-     config.add_facet_field 'EXCAVATOR_s', label: 'EXCAVATOR', limit: true
+     config.add_facet_field 'EXCAVATOR_s', label: 'Excavator', limit: true
      config.add_facet_field 'FEA_s', label: 'Feature', limit: true
      config.add_facet_field 'NOTES2_s', label: 'NOTES2', limit: true
      config.add_facet_field 'DOC_ss', label: 'Doc type', limit: true
      config.add_facet_field 'OBJ_s', label: 'OBJ', limit: true
-     config.add_facet_field 'PHOTOTYPE_s', label: 'PHOTOTYPE', limit: true
+     config.add_facet_field 'PHOTOTYPE_s', label: 'Photo type', limit: true
      config.add_facet_field 'REG_s', label: 'REG', limit: true
-     config.add_facet_field 'KEYTERMS_ss', label: 'KEYTERMS', limit: true
+     config.add_facet_field 'KEYTERMS_ss', label: 'Keyterms', limit: true
 
     # INDEX DISPLAY
      config.add_index_field 'T_s', label: 'T#'
@@ -171,25 +171,25 @@ class CatalogController < ApplicationController
      config.add_index_field 'OBJECT_s', label: 'Object'
      config.add_index_field 'BURIAL_s', label: 'Burial'
      config.add_index_field 'NOTES_s', label: 'Notes'
-     config.add_index_field 'NOTES2_s', label: 'NOTES2'
+     config.add_index_field 'NOTES2_s', label: 'Notes (addnl)'
      config.add_index_field 'MATERIAL_s', label: 'Material'
      config.add_index_field 'DATE_s', label: 'Date'
      config.add_index_field 'TRAY_s', label: 'Tray'
      config.add_index_field 'DOC_ss', label: 'Doc type'
 
-     config.add_index_field 'REVISIOND_s', label: 'REVISIOND'
+     config.add_index_field 'REVISIONDATE_s', label: 'Revision date'
      config.add_index_field 'DUPLICATED_s', label: 'DUPLICATED'
-     config.add_index_field 'EXCAVATOR_s', label: 'EXCAVATOR'
+     config.add_index_field 'EXCAVATOR_s', label: 'Excavator'
      config.add_index_field 'DTYPES_ss', label: 'File types'
      # config.add_index_field 'RECORDS_ss', helper_method: 'render_records', label: 'Records'
      config.add_index_field 'IMAGES_ss', helper_method: 'render_images', label: 'Images'
      # config.add_index_field 'FILENAMES_ss', helper_method: 'render_filenames', label: 'Filenames'
-     # config.add_index_field 'PHOTOTYPE_s', label: 'PHOTOTYPE'
-     # config.add_index_field 'REG_s', label: 'REG'
-     config.add_index_field 'FILEPATH_s', helper_method: 'render_image_link', label: 'MEDIA'
-     config.add_index_field 'FILENAME_s', label: 'FILENAME'
-     # config.add_index_field 'THUMBNAIL_s', label: 'THUMB'
-     # config.add_index_field 'KEYTERMS_ss', label: 'KEYTERMS'
+     # config.add_index_field 'PHOTOTYPE_s', label: 'Photo type'
+     # config.add_index_field 'REG_s', label: 'Reg number'
+     config.add_index_field 'FILEPATH_s', helper_method: 'render_image_link', label: 'Image'
+     config.add_index_field 'FILENAME_s', label: 'Filename'
+     # config.add_index_field 'THUMBNAIL_s', label: 'Thumbnail'
+     # config.add_index_field 'KEYTERMS_ss', label: 'Keyterms'
      config.add_index_field 'DTYPE_s', label: 'DTYPE'
 
 
@@ -211,22 +211,22 @@ class CatalogController < ApplicationController
      config.add_show_field 'REVISIONDATE_s', label: 'Revision date'
      config.add_show_field 'NOTES_s', label: 'Notes'
      config.add_show_field 'DUPLICATED_s', label: 'DUPLICATED'
-     config.add_show_field 'EXCAVATOR_s', label: 'Exavator'
+     config.add_show_field 'EXCAVATOR_s', label: 'Excavator'
      config.add_show_field 'FEATUR_s', label: 'Feature'
      config.add_show_field 'NOTES2_s', label: 'NOTES2'
      config.add_show_field 'OBJECT_s', label: 'Object #'
      config.add_show_field 'WEIGHT_s', label: 'Weight'
      config.add_show_field 'PHOTOTYPE_s', label: 'Photo type'
      config.add_show_field 'REG_s', label: 'Reg number'
-     config.add_show_field 'DTYPE_s', label: 'DTYPE'
-     config.add_show_field 'BURIAL_s', label: 'BURIAL'
-     config.add_show_field 'CLASS_s', label: 'CLASS'
-     config.add_show_field 'COUNT_s', label: 'COUNT'
+     config.add_show_field 'DTYPE_s', label: 'Document type'
+     config.add_show_field 'BURIAL_s', label: 'Burial'
+     config.add_show_field 'CLASS_s', label: 'Class'
+     config.add_show_field 'COUNT_s', label: 'Count'
      config.add_show_field 'ENTRY_DATE_s', label: 'Entry date'
      config.add_show_field 'EXCAVATIONDATE_s', label: 'Excavation date'
      config.add_show_field 'MATERIAL_s', label: 'Material'
      config.add_show_field 'REGISTRAR_s', label: 'Registrar'
-     config.add_show_field 'UNKNOWN_s', label: 'UNKNOWN'
+     config.add_show_field 'UNKNOWN_s', label: 'Unknown'
      config.add_show_field 'ETC_s', label: 'ETC'
      config.add_show_field 'TRAY_s', label: 'UPM Tray'
      config.add_show_field 'DOC_ss', label: 'Doc type'
