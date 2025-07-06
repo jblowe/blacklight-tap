@@ -43,18 +43,20 @@ def parse_image_filename(filepath):
     imagename = re.sub(r'tif\.tif', r'.tif', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'R##*([\d\w]+)', r'Reg\1', imagename, flags=re.IGNORECASE)
 
+
+    imagename = re.sub(r'\bfea ?b', ' B', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'^Tap[_\- ]?', 'Sea', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r' *(east|west|north|south) *', r' \1 ', imagename, flags=re.IGNORECASE)
+    # NKH 92 Ro 128.tif -> NKH 92 Ro1 #28.tif
+    imagename = re.sub(r'Ro (\d)(\d\d)', 'Ro\1 #\2', imagename, flags=0)
     imagename = re.sub(r' *(and) *', ' and ', imagename, flags=re.IGNORECASE)
-
     imagename = re.sub(r'(.*)\..+?$', r'\1', imagename, flags=re.IGNORECASE)  # get rid of extension
     imagename = re.sub(r'NPW ([A-Z]) ', r'NPW Sq \1 ', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'T# ?(\d+)', r'T\1', imagename, flags=re.IGNORECASE)  # normalized T numbers
+    imagename = re.sub(r'(Ro)[_ ]?(\d+)\-(\d+)', r'R\2 #\3', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'(Ro?l?l?|Op|Sq|Area|T|Lot|Fe?a?t?|Reg?)[_ ]*', r'\1', imagename, flags=re.IGNORECASE)
     # e.g. PL_R13_32.tif
     imagename = re.sub(r'([RL])(\d+)_(\d+)', r'\1\2_#\3', imagename, flags=re.IGNORECASE)
-    # e.g. NKH_92_Ro_534.thumb.jpg
-    imagename = re.sub(r'(Ro)[_ ]?(\d+)\-(\d+)', r'R\2_#\3', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'(Ro)[_ ]?(\d+)', r'R\2', imagename, flags=re.IGNORECASE)
     imagename = re.sub(r'w(\d+)', r' W\1', imagename)
     imagename = re.sub(r'(\d+)[#_](\d+)', r'\1_#\2', imagename, flags=re.IGNORECASE)

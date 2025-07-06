@@ -57,7 +57,7 @@ with open(output_file, 'w') as outputfile:
         # do a search for each document type
         response = s.query(filled_in_query, facet='true', facet_field='ROLL_s,EXP_s,OP_s,BURIAL_s'.split(','),
                            fq={},
-                           fields='ROLL_s,EXP_s,OP_s,BURIAL_s, SITE_s'.split(','),
+                           fields='ROLL_s,EXP_s,OP_s,BURIAL_s,SITE_s'.split(','),
                            rows=0, facet_limit=facet_limit,
                            facet_mincount=1)
 

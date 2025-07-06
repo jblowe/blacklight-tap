@@ -86,8 +86,8 @@ def compute_pattern(filename):
 errors = defaultdict(int)
 
 
-def write_errors(message, flds):
-    csverrors.writerow([message] + flds)
+def write_errors(message, flds, hit):
+    csverrors.writerow([message] + flds + [hit[h] for h in OUTPUT_FIELDS if '_s' in h and h in hit and 'KEYTERMS' not in h])
     errors[message] += 1
 
 
@@ -130,7 +130,7 @@ for i, dtype in enumerate(DTYPES):
                     hit['T_s'] = f'{key_tno}' if 'T' == key_tno[0] else f'T{key_tno}'
                     KEY_TYPES[dtype + ' Tno'] += 1
                 except:
-                    write_errors('non-numeric T#', [hit['T_s']])
+                    write_errors('non-numeric T#', [hit['T_s']], hit)
                     key_tno = hit['T_s']
             else:
                 key_tno = ''
@@ -147,6 +147,7 @@ for i, dtype in enumerate(DTYPES):
         OP = hit.get('OP_s', '')
         SQ = hit.get('SQ_s', '')
         BU = hit.get('BURIAL_s', '')
+        FE = hit.get('FEATURE_s', '')
         if YEAR != SEASON:
             pass
         if key_tno == '':
@@ -169,21 +170,22 @@ for i, dtype in enumerate(DTYPES):
             elif DIRECTION != 'DDD' or SKETCH != 'KKK':
                 if SKETCH == 'KKK':
                     SKETCH = '<unknown>'
-                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {DIRECTION} {SKETCH}".replace('  ', ' ').replace('  ',                                                                                            ' ')
+                    #  '.join(text_with_spaces.split())
+                key_photo = ' '.join(f'{SITE} {YEAR} {OP} {SQ} {DIRECTION} {SKETCH}'.split(' ')).strip()
                 KEY_TYPES[dtype + ' OP DDD KKK'] += 1
             elif ROLL != 'RRR' and EXP != 'EEE':
                 if SEASON == '92':
-                    key_photo = f"{SITE} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                    key_photo = f'{SITE} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}'
                     KEY_TYPES[dtype + ' SSS YY R E'] += 1
                 else:
-                    key_photo = f"{SITE} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                    key_photo = f'{SITE} {ROLL.zfill(3)} {EXP.zfill(3)}'
                     KEY_TYPES[dtype + ' SSS R E'] += 1
                 # photo_key = f"{YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
-            elif (OP + SQ + BU) != '':
-                key_photo = f"{SITE.ljust(3)} {YEAR} {OP} {SQ} {BU}".replace('  ', ' ').replace('  ', ' ')
-                KEY_TYPES[dtype + ' SSS YY OP/SQ BU'] += 1
+            elif (OP + SQ + BU + FE) != '':
+                key_photo = ' '.join(f'{SITE} {YEAR} {OP} {SQ} {BU} {FE}'.split(' ')).strip()
+                KEY_TYPES[dtype + ' SSS YY OP/SQ BU FE'] += 1
             elif ROLL != 'RRR' or EXP != 'EEE':
-                key_photo = f"{SITE.ljust(3)} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}"
+                key_photo = f'{SITE} {YEAR} {ROLL.zfill(3)} {EXP.zfill(3)}'
                 KEY_TYPES[dtype + ' SSS YY R E'] += 1
             else:
                 KEY_TYPES[dtype + ' SEQ'] += 1
@@ -203,14 +205,13 @@ for i, dtype in enumerate(DTYPES):
                           [hit.get(h,'') for h in OUTPUT_FIELDS if '_ss' not in h])
         record_list.append([key_tno, key_photo, key_seq, dtype, hit])
         if [key_tno, key_photo, key_seq] == [''] * 3:
-            write_errors('empty keys',
-                         [hit[h] for h in OUTPUT_FIELDS if '_s' in h and h in hit and 'KEYTERMS' not in h])
+            write_errors('empty keys', [dtype, key_tno, key_photo, key_seq, FILEPATH], hit)
         if (SITE == 'SSS' or YEAR == 'YY') and key_tno == '':
-            write_errors(f'vague key', [dtype, key_tno, key_photo, key_seq, FILEPATH])
+            write_errors(f'vague key', [dtype, key_tno, key_photo, key_seq, FILEPATH], hit)
         if YEAR in YEARS and SITE in LOCATIONS:
             DIST[YEAR][SITE] += 1
         else:
-            write_errors('site or season not found', [SITE, YEAR])
+            write_errors('site or season not found', [dtype, key_tno, key_photo, key_seq, FILEPATH], hit)
         if 'FILENAME_s' in hit and 'TAP 92 NPW OP7 B1' in hit['FILENAME_s']:
             pass
 
@@ -223,8 +224,7 @@ for r in record_list:
     elif r[2] != '':
         keys[r[2]].append(r)
     else:
-        write_errors('no key generated',
-                     [r[4][h] for h in OUTPUT_FIELDS if '_s' in h and h in r[4] and 'KEYTERMS' not in h])
+        write_errors('no key generated', [], hit)
 
 # free up some memory
 del record_list
@@ -245,6 +245,8 @@ with open(output_file, 'w') as outputfile:
         merged_fields = len(OUTPUT_FIELDS) * ['']
         for r in keys[key]:
             for i, f in enumerate(OUTPUT_FIELDS):
+                # we don't need to include certain fields that are aggregated elsewhere
+                if f in 'FILENAME_s IMAGENAME_s'.split(' '): continue
                 if merged_fields[i] == '':
                     merged_fields[i] = get_cell(r[4], f)
             output_arr = []
@@ -255,14 +257,14 @@ with open(output_file, 'w') as outputfile:
             [output_arr.append(get_cell(r[4], f)) for f in ['DTYPE_s'] + OUTPUT_FIELDS]
             output_str = '%'.join(output_arr)
             if output_str in subrecord:
-                write_errors('duplicate record in set', [[key] + output_arr])
+                write_errors('duplicate record in set', [[key] + output_arr], [])
             subrecord.append(output_str)
             add_items(merged_records, r[4])
             OUTPUT_COUNT += 1
 
         record_count = sum([merged_records['DTYPES_ss'][d] for d in merged_records['DTYPES_ss']])
         if record_count > 100:
-            write_errors('pathological merged record', [key, title, merged_records['DTYPES_ss']])
+            write_errors('pathological merged record', [key, title, merged_records['DTYPES_ss']], [])
             continue
 
         if 'TAP 92 NKH1 004' in key:

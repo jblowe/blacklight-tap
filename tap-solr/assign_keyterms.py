@@ -87,11 +87,9 @@ with open(input_file) as inputfile:
                 keyterm_string = 'KEYTERMS_ss'
                 doc_string = 'DOC_ss'
                 # rename TITLE_s if it already exists in incoming data
-                try:
-                    n = row.index('TITLE_s')
-                    row[n] = 'TITLE2_s'
-                except:
-                    pass
+                for n, r in enumerate(row):
+                    if r == 'TITLE_s':
+                        row[n] = 'TITLE_ss'
                 # rename DOC_ss if it already exists in incoming data
                 try:
                     n = row.index('DOC_ss')
