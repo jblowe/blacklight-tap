@@ -1,14 +1,15 @@
-<nav class="navbar navbar-expand-md navbar-light topbar" role="navigation">
+<nav class="navbar navbar-expand-md navbar-dark" style="background-color: #A51931;" role="navigation">
     <div class="justify-content-md-start">
-      <h4>
-        <a href="/" ><img width="140px" src="/tap-logo-small.png" style="color: #A51931;" alt="tap"></a>
-        <a style="white-space: nowrap; color: #A51931; text-decoration: none; margin-left: 50px;" href="/">Thailand Archeometallurgy Project: Finder</a>
-      </h4>
+      <a class="navbar-brand" href="#">
+        <img src="/tap-logo-small.png" alt="TAP" style="height: 40px;">
+        <span style="margin-left: 40px;">Thailand Archaeometallurgy Project</span>
+      </a>
     </div>
     <div class="collapse navbar-collapse justify-content-md-end" id="user-util-collapse">
       <%= render 'shared/user_util_links' %>
     </div>
 </nav>
+
 
 <%= content_tag :div, class: 'navbar navbar-search bg-light mb-1', role: 'navigation', aria: { label: t('blacklight.search.header') } do %>
   <div class="<%= container_classes %>">
