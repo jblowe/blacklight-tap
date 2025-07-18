@@ -21,4 +21,6 @@ Things you may want to cover:
 
 * Deployment instructions
 
-* ...
+Don't forget to
+
+```RAILS_ENV=production rails assets:precompile ```
