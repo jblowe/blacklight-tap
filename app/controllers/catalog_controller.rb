@@ -121,7 +121,7 @@ class CatalogController < ApplicationController
     # config.view.gallery.add_gallery_field 'IMAGES_ss', label: 'Image', type: :image
 
     # FACET FIELDS
-     config.add_facet_field 'DTYPE_s', label: 'Record type', limit: true
+     # config.add_facet_field 'DTYPE_s', label: 'Record type', limit: true
      config.add_facet_field 'DTYPES_ONLY_ss', label: 'Record types', limit: true
      config.add_facet_field 'T_s', label: 'T#', limit: true
      config.add_facet_field 'KEY_s', label: 'Merge key', limit: true
@@ -133,7 +133,7 @@ class CatalogController < ApplicationController
      config.add_facet_field 'EXP_s', label: 'Exposure', limit: true
      config.add_facet_field 'NOTES_s', label: 'Notes', limit: true
      config.add_facet_field 'MATERIAL_s', label: 'Material', limit: true
-     config.add_facet_field 'CLASS_s', label: 'CLASS', limit: true
+     config.add_facet_field 'CLASS_s', label: 'Class', limit: true
      config.add_facet_field 'OP_s', label: 'Op', limit: true
      config.add_facet_field 'SQ_s', label: 'Square', limit: true
      config.add_facet_field 'AREA_s', label: 'Area', limit: true
@@ -147,9 +147,9 @@ class CatalogController < ApplicationController
      config.add_facet_field 'FEA_s', label: 'Feature', limit: true
      config.add_facet_field 'NOTES2_s', label: 'NOTES2', limit: true
      config.add_facet_field 'DOC_ss', label: 'Doc type', limit: true
-     config.add_facet_field 'OBJ_s', label: 'OBJ', limit: true
+     config.add_facet_field 'OBJ_s', label: 'Object number', limit: true
      config.add_facet_field 'PHOTOTYPE_s', label: 'Photo type', limit: true
-     config.add_facet_field 'REG_s', label: 'REG', limit: true
+     config.add_facet_field 'REG_s', label: 'Reg number', limit: true
      config.add_facet_field 'KEYTERMS_ss', label: 'Keyterms', limit: true
 
     # INDEX DISPLAY
@@ -168,13 +168,15 @@ class CatalogController < ApplicationController
      config.add_index_field 'AREA_s', label: 'Area'
      config.add_index_field 'LOT_s', label: 'Lot'
      config.add_index_field 'FEA_s', label: 'Feature'
-     config.add_index_field 'OBJECT_s', label: 'Object'
+     config.add_index_field 'OBJECT_s', label: 'Object number'
+     config.add_index_field 'REG_s', label: 'Reg number'
      config.add_index_field 'BURIAL_s', label: 'Burial'
      config.add_index_field 'NOTES_s', label: 'Notes'
      config.add_index_field 'NOTES2_s', label: 'Notes (addnl)'
      config.add_index_field 'MATERIAL_s', label: 'Material'
      config.add_index_field 'DATE_s', label: 'Date'
      config.add_index_field 'TRAY_s', label: 'Tray'
+     config.add_index_field 'DTYPES_ss', label: 'Record types'
      config.add_index_field 'DOC_ss', label: 'Doc type'
 
      config.add_index_field 'REVISIONDATE_s', label: 'Revision date'
@@ -185,7 +187,7 @@ class CatalogController < ApplicationController
      config.add_index_field 'IMAGES_ss', helper_method: 'render_images', label: 'Images'
      # config.add_index_field 'FILENAMES_ss', helper_method: 'render_filenames', label: 'Filenames'
      # config.add_index_field 'PHOTOTYPE_s', label: 'Photo type'
-     # config.add_index_field 'REG_s', label: 'Reg number'
+     config.add_index_field 'REG_s', label: 'Reg number'
      config.add_index_field 'FILEPATH_s', helper_method: 'render_image_link', label: 'Image'
      config.add_index_field 'FILENAME_s', label: 'Filename'
      # config.add_index_field 'THUMBNAIL_s', label: 'Thumbnail'
@@ -196,6 +198,7 @@ class CatalogController < ApplicationController
     # SHOW DISPLAY
      config.add_show_field 'T_s', label: 'T#'
      config.add_show_field 'KEY_s', label: 'KEY'
+     config.add_show_field 'DTYPES_ss', label: 'Record types'
      # config.add_show_field 'T_i', label: 'T (numeric)'
      config.add_show_field 'SITE_s', label: 'Site'
      config.add_show_field 'YEAR_s', label: 'Year'
@@ -214,10 +217,10 @@ class CatalogController < ApplicationController
      config.add_show_field 'EXCAVATOR_s', label: 'Excavator'
      config.add_show_field 'FEATUR_s', label: 'Feature'
      config.add_show_field 'NOTES2_s', label: 'NOTES2'
-     config.add_show_field 'OBJECT_s', label: 'Object #'
+     config.add_show_field 'OBJECT_s', label: 'Object number'
+     config.add_show_field 'REG_s', label: 'Reg number'
      config.add_show_field 'WEIGHT_s', label: 'Weight'
      config.add_show_field 'PHOTOTYPE_s', label: 'Photo type'
-     config.add_show_field 'REG_s', label: 'Reg number'
      config.add_show_field 'DTYPE_s', label: 'Document type'
      config.add_show_field 'BURIAL_s', label: 'Burial'
      config.add_show_field 'CLASS_s', label: 'Class'
