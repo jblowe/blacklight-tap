@@ -75,6 +75,7 @@ def add_items(merged_records, hit):
 def fix_hit(hit):
     if 'YEAR_s' in hit and hit['YEAR_s'] == '8':
         hit['YEAR_s'] = '86'
+    # terrible, i know ... but clearly there are far too many Tnos that are 1 in 86
     if 'YEAR_s' in hit and hit['YEAR_s'] == '86' and 'T_s' in hit and 'T_s' == '1':
         hit['T_s'] = ''
 
@@ -148,8 +149,6 @@ for i, dtype in enumerate(DTYPES):
         SQ = hit.get('SQ_s', '')
         BU = hit.get('BURIAL_s', '')
         FE = hit.get('FEATURE_s', '')
-        if YEAR != SEASON:
-            pass
         if key_tno == '':
             if SITE not in 'HY|NPW|NKH|NKW|NML|PL|KTK'.split('|'):
                 try:
@@ -193,6 +192,11 @@ for i, dtype in enumerate(DTYPES):
             # zap sequence number key if one of the others exists
             if key_tno != '' or key_photo != '':
                 key_seq = ''
+
+            if YEAR == SEASON:
+                SEASON = ''
+            else:
+                write_errors(f'season and year differ: season {SEASON}, year {YEAR}', [dtype, key_tno, key_photo, key_seq, FILEPATH], hit)
 
         if 'T# 15141 TAP 92 Op1 Burial 2' in hit.get('FILENAME_s', ''):
             pass
