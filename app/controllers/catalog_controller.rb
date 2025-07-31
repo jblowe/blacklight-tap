@@ -121,7 +121,7 @@ class CatalogController < ApplicationController
     # config.view.gallery.add_gallery_field 'IMAGES_ss', label: 'Image', type: :image
 
     # FACET FIELDS
-     # config.add_facet_field 'DTYPE_s', label: 'Record type', limit: true
+     config.add_facet_field 'DTYPE_s', label: 'Record type', limit: true
      config.add_facet_field 'DTYPES_ONLY_ss', label: 'Record types', limit: true
      config.add_facet_field 'T_s', label: 'T#', limit: true
      config.add_facet_field 'KEY_s', label: 'Merge key', limit: true
@@ -182,12 +182,10 @@ class CatalogController < ApplicationController
      config.add_index_field 'REVISIONDATE_s', label: 'Revision date'
      config.add_index_field 'DUPLICATED_s', label: 'DUPLICATED'
      config.add_index_field 'EXCAVATOR_s', label: 'Excavator'
-     config.add_index_field 'DTYPES_ss', label: 'File types'
      # config.add_index_field 'RECORDS_ss', helper_method: 'render_records', label: 'Records'
      config.add_index_field 'IMAGES_ss', helper_method: 'render_images', label: 'Images'
      # config.add_index_field 'FILENAMES_ss', helper_method: 'render_filenames', label: 'Filenames'
      # config.add_index_field 'PHOTOTYPE_s', label: 'Photo type'
-     config.add_index_field 'REG_s', label: 'Reg number'
      config.add_index_field 'FILEPATH_s', helper_method: 'render_image_link', label: 'Image'
      config.add_index_field 'FILENAME_s', label: 'Filename'
      # config.add_index_field 'THUMBNAIL_s', label: 'Thumbnail'
